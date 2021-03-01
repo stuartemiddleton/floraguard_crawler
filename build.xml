@@ -44,6 +44,13 @@
 		</echo>
 	</target>
 
+<!--    Start the web crawler-->
+    <target name="crawl">
+        <exec executable="py.exe" dir="crawler/web_director" failonerror="true">
+			<arg value="runner.py"/>
+		</exec>
+    </target>
+
 	<!--
 		properties not dependant on local context
 		version numbers for software releases
