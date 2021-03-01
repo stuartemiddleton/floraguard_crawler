@@ -1,0 +1,14 @@
+*.pyc
+*.egg-info
+.tox
+.coverage
+.coverage-*
+htmlcov/
+.ipynb_checkpoints
+.DS_Store
+.cache
+*.json
+*.jl
+venv
+_sup
+screenshots/*.png
