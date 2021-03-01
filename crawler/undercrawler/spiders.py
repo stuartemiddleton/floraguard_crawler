@@ -22,15 +22,15 @@ from autologin_middleware import link_looks_like_logout
 
 from .crazy_form_submitter import search_form_requests
 from .utils import cached_property, load_directive, using_splash
-import crawler.undercrawler.settings
+import undercrawler.settings
 
 """
 FOCUSSED CRAWLER IMPORTS
 
 Note: Could add links to the frontier to make it smarter, might think about this later
 """
-from crawler.web_director.web_handler.WebpageHandler import WebpageHandler
-from crawler.web_director.parser import custom_parser
+from web_director.web_handler.WebpageHandler import WebpageHandler
+from web_director.parser import custom_parser
 
 
 class BaseSpider(scrapy.Spider):
@@ -322,7 +322,7 @@ class BaseSpider(scrapy.Spider):
 class ArachnadoSpider(BaseSpider):
     name = 'undercrawler_arachnado'
     custom_settings = Settings()
-    custom_settings.setmodule(crawler.undercrawler.settings)
+    custom_settings.setmodule(undercrawler.settings)
     custom_settings['ITEM_PIPELINES'][
         'arachnado.pipelines.mongoexport.MongoExportPipeline'] = 600
     custom_settings.update({

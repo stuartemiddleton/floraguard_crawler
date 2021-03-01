@@ -1,4 +1,4 @@
-from crawler.web_director.abc import WebAbstractClass
+from web_director.abc import WebAbstractClass
 
 
 class CustomWebpage(WebAbstractClass.WebpageAbstractClass):

@@ -2,7 +2,7 @@ import requests
 
 from bs4 import BeautifulSoup
 
-from crawler.web_director.user.User import UserInfo
+from web_director.user.User import UserInfo
 
 
 class WebpageHandler:
@@ -122,7 +122,7 @@ class WebpageHandler:
                 }, **self.people[person].attributes}
 
         import json
-        with open(r'..\exported_users\interesting_users.json', 'w') as fp:
+        with open(r'....\crawler\exported_users\interesting_users.json', 'w') as fp:
             json.dump(exported_data, fp)
 
         print(self.interesting_people)

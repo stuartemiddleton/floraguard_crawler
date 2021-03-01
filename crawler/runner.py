@@ -1,5 +1,5 @@
 import os
-from crawler.web_director.parser.custom_parser import create_custom_site, read_config
+from web_director.parser.custom_parser import create_custom_site, read_config
 
 
 def main():

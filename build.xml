@@ -46,7 +46,7 @@
 
 <!--    Start the web crawler-->
     <target name="crawl">
-        <exec executable="py.exe" dir="crawler/web_director" failonerror="true">
+        <exec executable="py.exe" dir="crawler/" failonerror="true">
 			<arg value="runner.py"/>
 		</exec>
     </target>

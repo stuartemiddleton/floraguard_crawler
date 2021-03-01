@@ -1,13 +1,13 @@
-from crawler.web_director.impl.CustomWebpage import CustomWebpage
-from crawler.web_director.impl.reference.AllModel import AllModel
-from crawler.web_director.impl.reference.ContainsKeywordModel import ThreadContainsKeywordModel
-from crawler.web_director.impl.reference.PositiveSentimentModel import CommentsPositiveSentiment
+from web_director.impl.CustomWebpage import CustomWebpage
+from web_director.impl.reference.AllModel import AllModel
+from web_director.impl.reference.ContainsKeywordModel import ThreadContainsKeywordModel
+from web_director.impl.reference.PositiveSentimentModel import CommentsPositiveSentiment
 import os
 import json
 
 
 def read_config():
-    path = r"..\web_director\run_config.json"
+    path = r"..\crawler\web_director\run_config.json"
     with open(path) as f:
         data = json.load(f)
     return data
@@ -16,7 +16,7 @@ def read_config():
 def create_custom_site(data):
     print("Searching for custom sites")
     name = data["name"]
-    path = r"..\web_director\parser\custom_webpages"
+    path = r"..\crawler\web_director\parser\custom_webpages"
     for file in os.listdir(path):
         with open(path + "\\" + file) as json_file:
             data = json.load(json_file)

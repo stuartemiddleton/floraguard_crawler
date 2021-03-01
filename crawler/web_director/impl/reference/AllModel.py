@@ -1,4 +1,4 @@
-from crawler.web_director.abc import ModelAbstractClass
+from web_director.abc import ModelAbstractClass
 
 
 class AllModel(ModelAbstractClass.ModelABC):
