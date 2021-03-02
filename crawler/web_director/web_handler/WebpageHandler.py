@@ -122,7 +122,7 @@ class WebpageHandler:
                 }, **self.people[person].attributes}
 
         import json
-        with open(r'....\crawler\exported_users\interesting_users.json', 'w') as fp:
+        with open(r'..\crawler\exported_users\interesting_users.json', 'w') as fp:
             json.dump(exported_data, fp)
 
         print(self.interesting_people)
