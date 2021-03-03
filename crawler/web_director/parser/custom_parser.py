@@ -1,6 +1,6 @@
 from web_director.impl.CustomWebpage import CustomWebpage
 from web_director.impl.reference.AllModel import AllModel
-from web_director.impl.reference.ContainsKeywordModel import ThreadContainsKeywordModel
+from web_director.impl.reference.ContainsKeywordModel import ContainsKeywordModel
 from web_director.impl.reference.PositiveSentimentModel import CommentsPositiveSentiment
 import os
 import json
@@ -45,6 +45,9 @@ def get_comment_model(data):
     if name == "sentiment":
         print("Loaded " + name + " model")
         return CommentsPositiveSentiment()
+    if name == "keyword":
+        print("Loaded " + name + " model")
+        return ContainsKeywordModel(data["comment_keyword"])
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
@@ -54,7 +57,7 @@ def get_thread_model(data):
     name = data["thread_model"]
     if name == "keyword":
         print("Loaded " + name + " model")
-        return ThreadContainsKeywordModel(data["keyword"])
+        return ContainsKeywordModel(data["thread_keyword"])
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()

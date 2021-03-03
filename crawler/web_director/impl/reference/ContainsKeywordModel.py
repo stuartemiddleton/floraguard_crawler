@@ -1,13 +1,21 @@
 from web_director.abc import ModelAbstractClass
 import re
 
-class ThreadContainsKeywordModel(ModelAbstractClass.ModelABC):
+class ContainsKeywordModel(ModelAbstractClass.ModelABC):
 
     def __init__(self, regex):
         self.regex = regex
 
-    def accept(self, title):
-        if re.match(self.regex, title):
+    def accept(self, text):
+        if type(text) is list:
+            for comment in text:
+                print(comment,self.regex,re.match(self.regex, comment))
+                if re.match(self.regex, comment):
+                    print("Interesting User")
+                    return True
+            return False
+        if re.match(self.regex, text):
             print("INTERESTING")
-            print(title)
-        return re.match(self.regex, title)
+            print(text)
+            return True
+        return False
