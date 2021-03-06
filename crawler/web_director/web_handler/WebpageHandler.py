@@ -89,6 +89,7 @@ class WebpageHandler:
                     print("INTERESTING USER: " + username)
                     profile_links.append(self.webpage.root_page_url + person.get_profile_url())
                     self.interesting_people.append(username)
+                    self.finish()
 
         return profile_links
 
@@ -122,7 +123,7 @@ class WebpageHandler:
                 }, **self.people[person].attributes}
 
         import json
-        with open(r'..\crawler\exported_users\interesting_users.json', 'w') as fp:
+        with open(r'..\crawler\exported_users\interesting_users_'+self.webpage.name+'.json', 'w') as fp:
             json.dump(exported_data, fp)
 
         print(self.interesting_people)

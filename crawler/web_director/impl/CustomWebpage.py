@@ -3,7 +3,8 @@ from web_director.abc import WebAbstractClass
 
 class CustomWebpage(WebAbstractClass.WebpageAbstractClass):
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.root_page_url = ""
         self.general_profile_url = ""
         self.general_threads_page_url = ""

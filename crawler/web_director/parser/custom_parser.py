@@ -22,7 +22,7 @@ def create_custom_site(data):
             data = json.load(json_file)
             if data["name"] not in name:
                 continue
-            webpage = CustomWebpage()
+            webpage = CustomWebpage(data["name"])
             webpage.root_page_url = data["root_page_url"]
             webpage.general_profile_url = data["general_profile_url"]
             webpage.general_threads_page_url = data["general_threads_page_url"]
@@ -47,7 +47,8 @@ def get_comment_model(data):
         return CommentsPositiveSentiment()
     if name == "keyword":
         print("Loaded " + name + " model")
-        return ContainsKeywordModel(data["comment_keyword"])
+        print("Comment regex " + text_to_regex(data["comment_keyword"]))
+        return ContainsKeywordModel(text_to_regex(data["comment_keyword"]))
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
@@ -57,7 +58,19 @@ def get_thread_model(data):
     name = data["thread_model"]
     if name == "keyword":
         print("Loaded " + name + " model")
+        print("Thread regex " + (data["thread_keyword"]))
         return ContainsKeywordModel(data["thread_keyword"])
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
+
+def text_to_regex(dict):
+    regex = r"(?i).*"
+    for _,v in dict.items():
+        for i in range(0,len(v)):
+            if i == 0:
+                regex += r"(^"+v[i]
+            regex += r"|^"+v[i]
+        regex += r").*"
+    return regex
+

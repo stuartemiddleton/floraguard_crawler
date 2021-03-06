@@ -9,7 +9,6 @@ class ContainsKeywordModel(ModelAbstractClass.ModelABC):
     def accept(self, text):
         if type(text) is list:
             for comment in text:
-                print(comment,self.regex,re.match(self.regex, comment))
                 if re.match(self.regex, comment):
                     print("Interesting User")
                     return True
@@ -19,3 +18,5 @@ class ContainsKeywordModel(ModelAbstractClass.ModelABC):
             print(text)
             return True
         return False
+
+

@@ -8,6 +8,9 @@ class UserInfo:
 
     def add_comment(self, comment, thread):
         if thread in self.comments:
+            # Limiting it to the most recent 100 comments in order to keep the memory impact low
+            if len(self.comments) > 100:
+                self.comments[thread].pop()
             self.comments[thread].append(comment)
         else:
             self.comments[thread] = [comment]
