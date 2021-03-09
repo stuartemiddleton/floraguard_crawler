@@ -80,8 +80,8 @@ def text_to_regex(dict):
     for _,v in dict.items():
         for i in range(0,len(v)):
             if i == 0:
-                regex += r"(^"+v[i]
-            regex += r"|^"+v[i]
+                regex += r"( "+v[i]
+            regex += r"| "+v[i]
         regex += r").*"
     return regex
 

@@ -3,6 +3,7 @@ import json
 import random
 import stanza
 
+
 if __name__ == '__main__':
     file_path = sys.argv[1]
     stanza.download('en')  # download English model
@@ -19,8 +20,8 @@ if __name__ == '__main__':
             else:
                 new_dict[a] += [k]
 
-    final_dict = {}
     i = 0
+    final_dict = {}
     for k, v in new_dict.items():
         for person in v:
             og = k
