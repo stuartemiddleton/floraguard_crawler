@@ -51,6 +51,23 @@
 		</exec>
     </target>
 
+    <!--    Testing custom configs-->
+    <target name="test.config">
+        <exec executable="py.exe" dir="crawler/scripts" failonerror="true">
+			<arg value="check_config_file.py"/>
+            <arg value="${path}"/>
+            <arg value="${thread_url}"/>
+		</exec>
+    </target>
+
+    <!--    Parsing the data for the graph-->
+    <target name="parse.crawled-data">
+        <exec executable="py.exe" dir="crawler/scripts" failonerror="true">
+			<arg value="parse_data_for_graph.py"/>
+            <arg value="${data}"/>
+		</exec>
+    </target>
+
 	<!--
 		properties not dependant on local context
 		version numbers for software releases

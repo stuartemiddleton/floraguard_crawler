@@ -4,7 +4,14 @@ from web_director.impl.reference.ContainsKeywordModel import ContainsKeywordMode
 from web_director.impl.reference.PositiveSentimentModel import CommentsPositiveSentiment
 import os
 import json
-
+# //                          "2": ["buy",
+# //                            "sell",
+# //                            "seeds",
+# //                            "sale",
+# //                            "selling",
+# //                            "purchase",
+# //                            "live plant",
+# //                            "swap"]
 
 def read_config():
     path = r"..\crawler\web_director\run_config.json"
@@ -52,6 +59,8 @@ def get_comment_model(data):
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
+    else:
+        raise Exception("Model not defined")
 
 
 def get_thread_model(data):
@@ -63,6 +72,8 @@ def get_thread_model(data):
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
+    else:
+        raise Exception("Model not defined")
 
 def text_to_regex(dict):
     regex = r"(?i).*"
