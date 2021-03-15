@@ -160,4 +160,16 @@ Then we install the required packages
 pip install -r requirements.txt
 ```
 
-The configuration of the crawler is located in ../web_directory 
+The configuration of the crawler is located in ```../web_directory``` ensure that the name is 'mocked'. If you want to add any further websites they should be placed in ```../web_directory/parser/custom_webpages```
+
+Next we check website configuration is correct
+
+```
+ant test.config -Dpath=../../crawler/web_director/parser/custom_webpages/mock_site.json -Dthread_url=https://sohaibkarous.wixsite.com/mock-unicorn/forum/general-discussions/unicorns-and-unee-products-for-sale 
+```
+If we see a message saying 'Success on Thread' then we can begin crawling
+
+```
+ant crawl
+```
+
