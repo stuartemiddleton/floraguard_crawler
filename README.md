@@ -145,13 +145,14 @@ Before you get to this step ensure that you have
 First step is clone the repo then CD into the repo
 
 ```
-git clone https://git.soton.ac.uk/ogie/focussed_crawler/-/tree/crawler-integration
+git clone https://git.soton.ac.uk/ogie/focussed_crawler.git
 cd focussed_crawler
+git checkout crawler-integration
 ```
 
 Following this we set up our environment and activate it
 ```
-python3 -m venv env
+python3.7 -m venv env
 .\env\Scripts\activate
 ```
 

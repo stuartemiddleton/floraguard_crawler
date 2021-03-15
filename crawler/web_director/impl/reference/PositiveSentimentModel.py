@@ -1,24 +1,27 @@
 from web_director.abc import ModelAbstractClass
 
 import re
-from textblob import TextBlob
-
+import stanza
 
 class CommentsPositiveSentiment(ModelAbstractClass.ModelABC):
 
+    def __init__(self, comment_length):
+        self.nlp = stanza.Pipeline(lang='en', processors='tokenize,sentiment')
+        self.comment_length = comment_length
+
     def accept(self, comments):
-        if len(comments) < 15:
+        if len(comments) < self.comment_length:
             return False
         comments_no_urls = [remove_url(x) for x in comments]
-        sentiment_objects = [TextBlob(comment) for comment in comments_no_urls]
-        positive, negative = 0,0
-        for x in sentiment_objects:
-            if x.polarity > 0:
-                positive+=1
-            else:
-                negative+=1
-        print("POSITIVE COMMENTS:", positive ,"NEGATIVE COMMENTS:",negative)
-        return positive > negative
+        sentiment = 0
+        for comment in comments_no_urls:
+            processed = self.nlp(comment).sentences
+            for sentence in processed:
+                # Negative sentiment is -1, neutral is 0, positive is 1
+                sentiment = (sentence.sentiment - 1)
+
+        # All comments return a positive sentiment
+        return sentiment > 0
 
 
 def remove_url(txt):
