@@ -160,3 +160,4 @@ Then we install the required packages
 pip install -r requirements.txt
 ```
 
+The configuration of the crawler is located in ../web_directory 
