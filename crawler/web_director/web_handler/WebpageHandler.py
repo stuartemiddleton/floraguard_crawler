@@ -8,12 +8,14 @@ from web_director.user.User import UserInfo
 class WebpageHandler:
 
     def __init__(self, webpage, thread_model, comment_model):
+        print("Anonymous crawling active")
         self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0}
         self.webpage = webpage
         self.thread_model = thread_model
         self.comment_model = comment_model
         self.people = {}
         self.interesting_people = []
+        self.anonymous = self.webpage.anonymous
 
     """
         Given the page content, processes the html
@@ -41,23 +43,28 @@ class WebpageHandler:
         block_list = soup.find_all(**self.webpage.block_regex())
         print("On page, block amount", len(block_list))
         for block in block_list:
-            user_name = None
             user_link = None
+            name = None
 
             for profile in block.find_all(**self.webpage.profile_regex()):
                 user_name = profile.find(**self.webpage.profile_name_regex())
                 user_link = profile.find(**self.webpage.profile_link_regex())
                 if user_name and user_link is not None:
+                    name = user_name.text
+                    if self.anonymous:
+                        # Hashing name if anonymous is active
+                        name = str(abs(hash(name)) % (10 ** 8))
                     break
             comment = block.find(**self.webpage.comment_regex()).get_text()
-            if user_name is not None and user_link is not None:
-                if user_name.text in self.people:
-                    self.people[user_name.text].add_comment(pretty(comment),
+            if name is not None and user_link is not None:
+
+                if name in self.people:
+                    self.people[name].add_comment(pretty(comment),
                                                        soup.find(**self.webpage.thread_name_regex()).text)
                 else:
-                    person = UserInfo(user_name.text, url_fixer(user_link['href']))
+                    person = UserInfo(name, url_fixer(user_link['href']))
                     person.add_comment(pretty(comment), soup.find(**self.webpage.thread_name_regex()).text)
-                    self.people[user_name.text] = person
+                    self.people[name] = person
 
         for link in self.direct_crawler():
             self.crawler_stats["Profiles scraped"] += 1
@@ -73,6 +80,9 @@ class WebpageHandler:
         if username is None:
             return
         username = username.get_text()
+        if self.anonymous:
+            # Hashing name if anonymous is active
+            username = str(abs(hash(username)) % (10 ** 8))
         if username not in self.people:
             return
         for name, regex in self.webpage.attributes_regex().items():

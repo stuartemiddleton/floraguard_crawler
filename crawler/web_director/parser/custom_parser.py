@@ -20,16 +20,16 @@ def read_config():
     return data
 
 
-def create_custom_site(data):
+def create_custom_site(config):
     print("Searching for custom sites")
-    name = data["name"]
+    name = config["name"]
     path = r"..\crawler\web_director\parser\custom_webpages"
     for file in os.listdir(path):
         with open(path + "\\" + file) as json_file:
             data = json.load(json_file)
             if data["name"] not in name:
                 continue
-            webpage = CustomWebpage(data["name"])
+            webpage = CustomWebpage(data["name"], config["anonymous"])
             webpage.root_page_url = data["root_page_url"]
             webpage.general_profile_url = data["general_profile_url"]
             webpage.general_threads_page_url = data["general_threads_page_url"]
