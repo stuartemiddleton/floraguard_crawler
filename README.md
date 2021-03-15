@@ -139,7 +139,7 @@ Contact: sem03@soton.ac.uk
 Before you get to this step ensure that you have 
 
 - Git installed
-- Python 3.7
+- Python 3.6
 - Apache ant
 
 First step is clone the repo then CD into the repo
@@ -152,6 +152,7 @@ git checkout crawler-integration
 
 Following this we set up our environment and activate it
 ```
+pip install venv
 python3.7 -m venv env
 .\env\Scripts\activate
 ```
@@ -172,5 +173,12 @@ If we see a message saying 'Success on Thread' then we can begin crawling
 
 ```
 ant crawl
+```
+
+Once the crawl is completed we parse data and then visualise
+
+```
+ant parse.crawled-data -Ddata=..\..\crawler\exported_users\interesting_users_mocked.json
+ant test.intel_viz -Dconfig=../../config/example.ini -Ddata-graph=../../crawler/exported_users/parsed_data.json 
 ```
 
