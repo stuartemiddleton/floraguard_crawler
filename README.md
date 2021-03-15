@@ -135,3 +135,28 @@ GitLab URI: https://git.soton.ac.uk/ogie/focussed_crawler.git
 
 Contact: sem03@soton.ac.uk
 
+# Running the crawler
+Before you get to this step ensure that you have 
+
+- Git installed
+- Python 3.7
+- Apache ant
+
+First step is clone the repo then CD into the repo
+
+```
+git clone https://git.soton.ac.uk/ogie/focussed_crawler/-/tree/crawler-integration
+cd focussed_crawler
+```
+
+Following this we set up our environment and activate it
+```
+python3 -m venv env
+.\env\Scripts\activate
+```
+
+Then we install the required packages
+```
+pip install -r requirements.txt
+```
+
