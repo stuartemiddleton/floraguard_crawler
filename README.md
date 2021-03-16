@@ -133,14 +133,6 @@ ant test.intel_viz -Dconfig=../../config/example.ini -Ddata-graph=../../corpus/e
 
 GitLab URI: https://git.soton.ac.uk/ogie/focussed_crawler.git
 
-Contact: sem03@soton.ac.uk
-
-# Running the crawler
-Before you get to this step ensure that you have 
-
-- Git installed
-- Python 3.6
-- Apache ant
 
 First step is clone the repo then CD into the repo
 
@@ -148,12 +140,19 @@ First step is clone the repo then CD into the repo
 git clone https://git.soton.ac.uk/ogie/focussed_crawler.git
 cd focussed_crawler
 git checkout crawler-integration
+Contact: sem03@soton.ac.uk
+
+# Running the crawler
+Before you get to this step ensure that you have 
+
+- Git installed
+- Python 3.7
+- Apache ant
 ```
 
 Following this we set up our environment and activate it
 ```
-pip install venv
-python3.7 -m venv env
+python -m venv env
 .\env\Scripts\activate
 ```
 
