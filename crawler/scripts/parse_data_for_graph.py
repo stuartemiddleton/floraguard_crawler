@@ -37,7 +37,8 @@ if __name__ == '__main__':
                     for word in sentence.to_dict():
                         if word['ner'] != 'O':
                             ner_tags.append(word['ner'] + ":" + word['text'])
-
+                if len(ner_tags) == 0:
+                    continue
                 final_dict[_id][str(i)] = [{"entity": ner_tags}]
                 i += 1
 

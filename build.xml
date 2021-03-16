@@ -68,6 +68,40 @@
 		</exec>
     </target>
 
+<!--code for first iteration of viz-->
+    	<target name="viz.trial_1" depends="clean, init.properties" description="intel graph visualization code, github version">
+
+		<fail unless="config" message="config missing property e.g. -Dconfig=../../config/example.ini"/>
+		<fail unless="data-graph" message="data-graph missing property -Ddata-graph=../../corpus/example/example_data_graph.json"/>
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.dir}/bin"/>
+
+		<echo>
+		Viz [start]
+		</echo>
+
+		<!-- copy files -->
+		<copy todir="${build.dir}/bin" failonerror="false">
+			<!-- app -->
+			<fileset dir="${src.dir}">
+				<include name="intel_viz.py"/>
+				<include name="intel_viz_lib.py"/>
+			</fileset>
+		</copy>
+
+		<!-- run app -->
+		<exec executable="py.exe" dir="${build.dir}/bin" failonerror="true">
+			<arg value="intel_viz.py"/>
+			<arg value="${config}"/>
+			<arg value="${data-graph}"/>
+		</exec>
+
+		<echo>
+		Viz [end]
+		</echo>
+	</target>
+
 	<!--
 		properties not dependant on local context
 		version numbers for software releases
