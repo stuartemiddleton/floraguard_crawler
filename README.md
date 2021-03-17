@@ -181,6 +181,6 @@ Once the crawl is completed we parse data and then visualise
 
 ```
 ant parse.crawled-data -Ddata=..\..\crawler\exported_users\interesting_users_mocked.json
-ant test.intel_viz -Dconfig=../../config/trial_1.ini -Ddata-graph=../../crawler/exported_users/parsed_data.json 
+ant viz.trial_1 -Dconfig=../../config/trial_1.ini -Ddata-graph=../../crawler/exported_users/parsed_data.json
 ```
 
