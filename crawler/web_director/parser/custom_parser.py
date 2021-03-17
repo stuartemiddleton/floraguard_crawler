@@ -57,8 +57,12 @@ def get_comment_model(data):
         return CommentsPositiveSentiment(comment_length=1)
     if name == "keyword":
         print("Loaded " + name + " model")
-        print("Comment regex " + text_to_regex(data["comment_keyword"]))
-        return ContainsKeywordModel(text_to_regex(data["comment_keyword"]), comment_length=data["comment_length"])
+        if data['use_comment_file']:
+            print("Comment regex " + read_txt(data["comment_keyword_location"]))
+            return ContainsKeywordModel(read_txt(data["comment_keyword_location"]), comment_length=data["comment_length"])
+        else:
+            print("Comment regex " + text_to_regex(data["comment_keyword"]))
+            return ContainsKeywordModel(text_to_regex(data["comment_keyword"]), comment_length=data["comment_length"])
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
@@ -70,8 +74,8 @@ def get_thread_model(data):
     name = data["thread_model"]
     if name == "keyword":
         print("Loaded " + name + " model")
-        print("Thread regex " + (data["thread_keyword"]))
-        return ContainsKeywordModel(data["thread_keyword"], comment_length=data["comment_length"])
+        print("Thread regex " + text_to_regex(data["thread_keyword"]))
+        return ContainsKeywordModel(text_to_regex(data["thread_keyword"]), comment_length=data["comment_length"])
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
@@ -96,4 +100,17 @@ def text_to_regex(dict):
                 regex += r"( " + v[i]
             regex += r"| " + v[i]
         regex += r").*"
+    return regex
+
+
+def read_txt(paths):
+    regex = r"(?i).*"
+    for path in paths:
+        with open(path) as f:
+            lines = f.readlines()
+            for i in range(0, len(lines)):
+                if i == 0:
+                    regex += r"( " + lines[i].strip()
+                regex += r"| " + lines[i].strip()
+            regex += r").*"
     return regex
