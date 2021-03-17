@@ -7,7 +7,7 @@ from web_director.user.User import UserInfo
 
 class WebpageHandler:
 
-    def __init__(self, webpage, thread_model, comment_model):
+    def __init__(self, webpage, thread_model, comment_model, filter_comments):
         print("Anonymous crawling active")
         self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0}
         self.webpage = webpage
@@ -16,6 +16,7 @@ class WebpageHandler:
         self.people = {}
         self.interesting_people = []
         self.anonymous = self.webpage.anonymous
+        self.filter_comments = filter_comments
 
     """
         Given the page content, processes the html
@@ -24,7 +25,7 @@ class WebpageHandler:
     def process(self, page, url):
         if self.webpage.get_general_thread_url() in url:
             if self.important_thread(page):
-                self.thread_page_handler(page)
+                self.thread_page_handler(page,url)
                 return True
             return False
 
@@ -37,7 +38,7 @@ class WebpageHandler:
         Extracts the comments and commenter from the page while storing it
     """
 
-    def thread_page_handler(self, page):
+    def thread_page_handler(self, page,url):
         soup = BeautifulSoup(page, 'html.parser')
         self.crawler_stats["Threads seen"] += 1
         block_list = soup.find_all(**self.webpage.block_regex())
@@ -60,10 +61,10 @@ class WebpageHandler:
 
                 if name in self.people:
                     self.people[name].add_comment(pretty(comment),
-                                                       soup.find(**self.webpage.thread_name_regex()).text)
+                                                       soup.find(**self.webpage.thread_name_regex()).text,url)
                 else:
                     person = UserInfo(name, url_fixer(user_link['href']))
-                    person.add_comment(pretty(comment), soup.find(**self.webpage.thread_name_regex()).text)
+                    person.add_comment(pretty(comment), soup.find(**self.webpage.thread_name_regex()).text,url)
                     self.people[name] = person
 
         for link in self.direct_crawler():
@@ -124,11 +125,21 @@ class WebpageHandler:
         import datetime
         exported_data = {}
         for person in self.interesting_people:
+            comments = self.people[person].comments
+            if self.filter_comments:
+                filtered = {}
+                for thread, com in comments.items():
+                    filtered_comments = list(filter(self.comment_model.accept,list(chunks(com,1))))
+                    if len(filtered_comments) == 0:
+                        continue
+                    filtered[thread] = [item for sublist in filtered_comments for item in sublist]
+                comments = filtered
+
             exported_data[person] = {
                 **{
                     "time-stamp": datetime.date.today().isoformat(),
                     "username": person,
-                    "comments": self.people[person].comments,
+                    "comments": comments,
                     "profile_url": self.webpage.root_page_url + self.people[person].get_profile_url()
                 }, **self.people[person].attributes}
 
@@ -153,3 +164,11 @@ def url_fixer(string):
             return url_fixer(string[1:])
     else:
         return string
+
+def chunks(l, n):
+    if n == 0:
+        n=1
+    # For item i in a range that is a length of l,
+    for i in range(0, len(l), n):
+        # Create an index range for l of n items:
+        yield l[i:i+n]

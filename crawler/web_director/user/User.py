@@ -6,14 +6,14 @@ class UserInfo:
         self.attributes = {}
         self.profile_url = profile_url
 
-    def add_comment(self, comment, thread):
-        if thread in self.comments:
+    def add_comment(self, comment, thread,url):
+        if url in self.comments:
             # Limiting it to the most recent 100 comments in order to keep the memory impact low
             if len(self.comments) > 100:
-                self.comments[thread].pop()
-            self.comments[thread].append(comment)
+                self.comments[url].pop()
+            self.comments[url].append(comment)
         else:
-            self.comments[thread] = [comment]
+            self.comments[url] = [comment]
 
     def add_attribute(self, attribute_name, attribute):
         if attribute_name in self.attributes:

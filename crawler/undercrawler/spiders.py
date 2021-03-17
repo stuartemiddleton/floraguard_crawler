@@ -56,10 +56,7 @@ class BaseSpider(scrapy.Spider):
         self.lua_source = load_directive('headless_horseman.lua')
         self.js_source = load_directive('headless_horseman.js')
         # Adding the web_director handler
-        data = custom_parser.read_config()
-        self.webpage_handler = WebpageHandler(custom_parser.create_custom_site(data),
-                                              custom_parser.get_thread_model(data),
-                                              custom_parser.get_comment_model(data))
+        self.webpage_handler = custom_parser.create_webpage_handler()
         super().__init__(*args, **kwargs)
 
     def start_requests(self):

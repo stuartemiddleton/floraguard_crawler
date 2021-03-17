@@ -4,6 +4,7 @@ from web_director.impl.reference.ContainsKeywordModel import ContainsKeywordMode
 from web_director.impl.reference.PositiveSentimentModel import CommentsPositiveSentiment
 import os
 import json
+
 # //                          "2": ["buy",
 # //                            "sell",
 # //                            "seeds",
@@ -12,6 +13,8 @@ import json
 # //                            "purchase",
 # //                            "live plant",
 # //                            "swap"]
+from web_director.web_handler.WebpageHandler import WebpageHandler
+
 
 def read_config():
     path = r"..\crawler\web_director\run_config.json"
@@ -51,11 +54,11 @@ def get_comment_model(data):
     name = data["comment_model"]
     if name == "sentiment":
         print("Loaded " + name + " model")
-        return CommentsPositiveSentiment()
+        return CommentsPositiveSentiment(comment_length=1)
     if name == "keyword":
         print("Loaded " + name + " model")
         print("Comment regex " + text_to_regex(data["comment_keyword"]))
-        return ContainsKeywordModel(text_to_regex(data["comment_keyword"]))
+        return ContainsKeywordModel(text_to_regex(data["comment_keyword"]), comment_length=data["comment_length"])
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
@@ -68,20 +71,29 @@ def get_thread_model(data):
     if name == "keyword":
         print("Loaded " + name + " model")
         print("Thread regex " + (data["thread_keyword"]))
-        return ContainsKeywordModel(data["thread_keyword"])
+        return ContainsKeywordModel(data["thread_keyword"], comment_length=data["comment_length"])
     if name == "all":
         print("Loaded " + name + " model")
         return AllModel()
     else:
         raise Exception("Model not defined")
 
+
+def create_webpage_handler():
+    data = read_config()
+    webpage_handler = WebpageHandler(create_custom_site(data),
+                                     get_thread_model(data),
+                                     get_comment_model(data),
+                                     data["filter_comments"])
+    return webpage_handler
+
+
 def text_to_regex(dict):
     regex = r"(?i).*"
-    for _,v in dict.items():
-        for i in range(0,len(v)):
+    for _, v in dict.items():
+        for i in range(0, len(v)):
             if i == 0:
-                regex += r"( "+v[i]
-            regex += r"| "+v[i]
+                regex += r"( " + v[i]
+            regex += r"| " + v[i]
         regex += r").*"
     return regex
-
