@@ -154,13 +154,20 @@ cd focussed_crawler
 
 Following this we set up our environment and activate it
 ```
-python -m venv env
-.\env\Scripts\activate
-```
+# win10 powershell users only (allow scripts to run)
+Set-ExecutionPolicy -Scope CurrentUser Unrestricted
 
-Then we install the required packages
-```
-pip install -r requirements.txt
+# make a new env folder (to store downloaded libraries etc)
+py -m venv env
+
+# upgrade pip (needed for cryptography install)
+py -m pip install --upgrade pip
+
+# activate env
+.\env\Scripts\activate
+
+# install all prerequisites to env
+py -m pip install -r requirements.txt
 ```
 
 The configuration of the crawler is located in ```../web_directory``` ensure that the name is 'mocked'. If you want to add any further websites they should be placed in ```../web_directory/parser/custom_webpages```
