@@ -2,6 +2,17 @@ import sys
 import json
 import random
 import stanza
+import re
+def read_txt(path):
+    regex = r"(?i).*"
+    with open(path) as f:
+        lines = f.readlines()
+        for i in range(0, len(lines)):
+            if i == 0:
+                regex += r"( " + lines[i].strip()
+            regex += r"| " + lines[i].strip()
+        regex += r").*"
+    return regex
 
 
 if __name__ == '__main__':
@@ -25,7 +36,7 @@ if __name__ == '__main__':
     for k, v in new_dict.items():
         for person in v:
             og = k
-            _id = k.replace(" ", "") + "" + str(random.randint(1, 1000))
+            _id = k.rsplit('/',1)[1] + "" + str(random.randint(1, 10000))
             final_dict[_id] = {
                 "author": person,
                 "page_url": og
@@ -37,10 +48,18 @@ if __name__ == '__main__':
                     for word in sentence.to_dict():
                         if word['ner'] != 'O':
                             ner_tags.append(word['ner'] + ":" + word['text'])
-                if len(ner_tags) == 0:
-                    continue
+
+                ######### CUSTOM NERS ##########
+                plants_regex = read_txt(r'../web_director/plants.txt')
+                trade_regex = read_txt(r'../web_director/trade_words.txt')
+                for words in re.findall(plants_regex, comment):
+                    ner_tags.append("NER-BANNED_PLANT:"+ words)
+                for words in re.findall(trade_regex, comment):
+                    ner_tags.append("TRADE-BEHAVIOUR:"+ words)
+                ################################
                 final_dict[_id][str(i)] = [{"entity": ner_tags}]
                 i += 1
 
     with open(r'../exported_users/parsed_data.json', 'w') as fp:
         json.dump(final_dict, fp)
+
