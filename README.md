@@ -150,7 +150,6 @@ First step is clone the repo then CD into the repo
 ```
 git clone https://git.soton.ac.uk/ogie/focussed_crawler.git
 cd focussed_crawler
-git checkout crawler-integration
 ```
 
 Following this we set up our environment and activate it
