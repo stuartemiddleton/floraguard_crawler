@@ -1,4 +1,6 @@
 from web_director.impl.CustomWebpage import CustomWebpage
+from web_director.impl.CustomMarketPlace import CustomMarketPlace
+
 from web_director.impl.reference.AllModel import AllModel
 from web_director.impl.reference.ContainsKeywordModel import ContainsKeywordModel
 from web_director.impl.reference.PositiveSentimentModel import CommentsPositiveSentiment
@@ -32,20 +34,34 @@ def create_custom_site(config):
             data = json.load(json_file)
             if data["name"] not in name:
                 continue
-            webpage = CustomWebpage(data["name"], config["anonymous"])
-            webpage.root_page_url = data["root_page_url"]
-            webpage.general_profile_url = data["general_profile_url"]
-            webpage.general_threads_page_url = data["general_threads_page_url"]
-            webpage.general_thread_url = data["general_thread_url"]
-            webpage._thread_name_regex = data["thread_name_regex"]
-            webpage._block_regex = data["block_regex"]
-            webpage._comment_regex = data["comment_regex"]
-            webpage._profile_regex = data["profile_regex"]
-            webpage._profile_name_regex = data["profile_name_regex"]
-            webpage._profile_link_regex = data["profile_link_regex"]
-            webpage._attributes_regex = data["attributes_regex"]
-            print("Created web_director, returning result")
-            return webpage
+            if data["type"] == "forum":
+                webpage = CustomWebpage(data["name"])
+                webpage.root_page_url = data["root_page_url"]
+                webpage.general_profile_url = data["general_profile_url"]
+                webpage.general_start_page_url = data["general_threads_page_url"]
+                webpage.general_thread_url = data["general_thread_url"]
+                webpage._thread_name_regex = data["thread_name_regex"]
+                webpage._block_regex = data["block_regex"]
+                webpage._comment_regex = data["comment_regex"]
+                webpage._profile_regex = data["profile_regex"]
+                webpage._profile_name_regex = data["profile_name_regex"]
+                webpage._profile_link_regex = data["profile_link_regex"]
+                webpage._attributes_regex = data["attributes_regex"]
+                print("Created web_director, returning result")
+                return webpage
+            if data["type"] == "marketplace":
+                webpage = CustomMarketPlace(data["name"])
+                webpage.root_page_url = data["root_page_url"]
+                webpage.general_start_page_url = data["general_items_url"]
+                webpage.general_item_url = data["general_item_url"]
+                webpage._sale_item_name_regex = data["sale_item_name_regex"]
+                webpage._seller_name_regex = data["seller_name_regex"]
+                webpage._seller_description_regex = data["seller_description_regex"]
+                webpage._seller_url_regex = data["seller_url_regex"]
+                webpage._seller_block_regex = data["seller_block_regex"]
+                print("Created web_director, returning result")
+                return webpage
+
 
     raise Exception("Cannot find custom site")
 
@@ -88,7 +104,7 @@ def create_webpage_handler():
     webpage_handler = WebpageHandler(create_custom_site(data),
                                      get_thread_model(data),
                                      get_comment_model(data),
-                                     data["filter_comments"])
+                                     data["filter_comments"], data["anonymous"])
     return webpage_handler
 
 

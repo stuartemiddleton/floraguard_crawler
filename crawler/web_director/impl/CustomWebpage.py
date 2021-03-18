@@ -3,12 +3,11 @@ from web_director.abc import WebAbstractClass
 
 class CustomWebpage(WebAbstractClass.WebpageAbstractClass):
 
-    def __init__(self, name, anonymous):
+    def __init__(self, name):
         self.name = name
-        self.anonymous = anonymous
         self.root_page_url = ""
         self.general_profile_url = ""
-        self.general_threads_page_url = ""
+        self.general_start_page_url = ""
         self.general_thread_url = ""
         self._thread_name_regex = {}
         self._block_regex = {}
@@ -21,10 +20,10 @@ class CustomWebpage(WebAbstractClass.WebpageAbstractClass):
     def get_root_page_url(self):
         return self.root_page_url
 
-    def get_general_threads_page_url(self):
-        return self.general_threads_page_url
+    def get_general_start_page_url(self):
+        return self.general_start_page_url
 
-    def get_general_thread_url(self):
+    def get_general_page_url(self):
         return self.general_thread_url
 
     def get_general_profile_url(self):

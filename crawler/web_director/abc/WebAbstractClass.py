@@ -24,7 +24,7 @@ class WebpageAbstractClass(ABC):
     """
 
     @abstractmethod
-    def get_general_threads_page_url(self):
+    def get_general_start_page_url(self):
         pass
 
     """
@@ -33,7 +33,7 @@ class WebpageAbstractClass(ABC):
     """
 
     @abstractmethod
-    def get_general_thread_url(self):
+    def get_general_page_url(self):
         pass
 
     """

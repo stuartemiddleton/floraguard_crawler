@@ -9,10 +9,10 @@ class StackOverFlowWebpage(WebAbstractClass.WebpageAbstractClass):
     def get_root_page_url(self):
         return self.root_page_url
 
-    def get_general_threads_page_url(self):
+    def get_general_start_page_url(self):
         return self.root_page_url + "/questions"
 
-    def get_general_thread_url(self):
+    def get_general_page_url(self):
         return self.root_page_url + "/questions"
 
     def get_general_profile_url(self):

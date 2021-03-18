@@ -2,12 +2,14 @@ import requests
 
 from bs4 import BeautifulSoup
 
+from web_director.user.Seller import SellerInfo
 from web_director.user.User import UserInfo
+from web_director.abc import MarketPlaceABC, WebAbstractClass
 
 
 class WebpageHandler:
 
-    def __init__(self, webpage, thread_model, comment_model, filter_comments):
+    def __init__(self, webpage, thread_model, comment_model, filter_comments, anonymous):
         print("Anonymous crawling active")
         self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0}
         self.webpage = webpage
@@ -15,7 +17,7 @@ class WebpageHandler:
         self.comment_model = comment_model
         self.people = {}
         self.interesting_people = []
-        self.anonymous = self.webpage.anonymous
+        self.anonymous = anonymous
         self.filter_comments = filter_comments
 
     """
@@ -23,17 +25,24 @@ class WebpageHandler:
     """
 
     def process(self, page, url):
-        if self.webpage.get_general_thread_url() in url:
-            if self.important_thread(page):
-                self.thread_page_handler(page,url)
-                return True
-            return False
+        if issubclass(self.webpage.__class__, WebAbstractClass.WebpageAbstractClass):
+            if self.webpage.get_general_page_url() in url:
+                if self.important_thread(page):
+                    self.thread_page_handler(page,url)
+                    return True
+                return False
 
-        if self.webpage.get_general_profile_url() in url:
-            self.profile_page_handler(page)
+            if self.webpage.get_general_profile_url() in url:
+                self.profile_page_handler(page)
 
+            return True
+        elif issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
+            if self.webpage.get_general_page_url() in url:
+                self.item_page_handler(page,url)
+                return False
         return True
 
+######################################### FORUM HANDLERS ####################################################
     """
         Extracts the comments and commenter from the page while storing it
     """
@@ -90,19 +99,6 @@ class WebpageHandler:
             for data in soup.find_all(**regex):
                 self.people[username].add_attribute(name, data.get_text())
 
-    def direct_crawler(self):
-        profile_links = []
-        for username, person in self.people.items():
-            if username in self.interesting_people:
-                continue
-            else:
-                if self.comment_model.accept(person.get_all_comments()):
-                    print("INTERESTING USER: " + username)
-                    profile_links.append(self.webpage.root_page_url + person.get_profile_url())
-                    self.interesting_people.append(username)
-                    self.finish()
-
-        return profile_links
 
     """
         Determines if the thread is something we want to keep looking at
@@ -115,6 +111,66 @@ class WebpageHandler:
             return True
         interesting = self.thread_model.accept(title.text)
         return interesting
+
+######################################### MARKETPLACE HANDLERS ####################################################
+
+    def item_page_handler(self,page,url):
+        print("On item page")
+        soup = BeautifulSoup(page, 'html.parser')
+        item_name = soup.find(**self.webpage.sale_item_name_regex())
+
+        seller_block = soup.find(**self.webpage.seller_block_regex())
+        if seller_block is None:
+            return
+
+        print("Found seller block")
+        seller_url = seller_block.find(**self.webpage.seller_url_regex())
+        name = seller_block.find(**self.webpage.seller_name_regex())
+
+        seller_description = soup.find(**self.webpage.seller_description_regex())
+
+        if item_name and name and seller_url is not None:
+            print("Item: " + pretty(item_name.get_text()))
+            name = pretty(name.get_text())
+            if seller_description is None:
+                text = "{Cant find}"
+            else:
+                text = seller_description.get_text()
+
+            print("Seller name: " + name)
+            print("Seller url: " + seller_url['href'])
+            print("Seller decr: " + pretty(seller_description.text))
+
+            if name in self.people:
+                self.people[name].add_item(url, pretty(text))
+            else:
+
+                person = SellerInfo(name, url_fixer(seller_url['href']))
+                person.add_item(url, pretty(seller_description.text))
+                self.people[name] = person
+
+        self.direct_crawler()
+
+
+    """
+        Function identifying the interesting people
+    """
+
+    def direct_crawler(self):
+        profile_links = []
+        for username, person in self.people.items():
+            if username in self.interesting_people:
+                continue
+            else:
+                if self.comment_model.accept(person.get_all_comments()):
+                    print(username)
+                    print("INTERESTING USER: " + username)
+                    profile_links.append(self.webpage.root_page_url + person.get_profile_url())
+                    self.interesting_people.append(username)
+                    self.finish()
+
+        return profile_links
+
 
     """
         Finished crawling

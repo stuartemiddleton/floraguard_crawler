@@ -9,10 +9,10 @@ class DebatePoliticsWebpage(WebAbstractClass.WebpageAbstractClass):
     def get_root_page_url(self):
         return self.root_page_url
 
-    def get_general_threads_page_url(self):
+    def get_general_start_page_url(self):
         return self.root_page_url + "/whats-new/posts/295247/"
 
-    def get_general_thread_url(self):
+    def get_general_page_url(self):
         return self.root_page_url + "/threads"
 
     def get_general_profile_url(self):

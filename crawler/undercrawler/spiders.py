@@ -99,10 +99,10 @@ class BaseSpider(scrapy.Spider):
         #     response.url, self.settings.getbool('HARD_URL_CONSTRAINT'))
 
         allowed_list = [
-            allowed_re(self.webpage_handler.webpage.get_general_threads_page_url(),
+            allowed_re(self.webpage_handler.webpage.get_general_start_page_url(),
                        self.settings.getbool('HARD_URL_CONSTRAINT')),
 
-            allowed_re(self.webpage_handler.webpage.get_general_thread_url(),
+            allowed_re(self.webpage_handler.webpage.get_general_page_url(),
                        self.settings.getbool('HARD_URL_CONSTRAINT'))
         ]
 
