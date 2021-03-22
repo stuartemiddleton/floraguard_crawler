@@ -34,9 +34,10 @@ if __name__ == '__main__':
     i = 0
     final_dict = {}
     for k, v in new_dict.items():
+        # < website > _thread_ < thread_id > _post_ < post_id >
         for person in v:
             og = k
-            _id = k.rsplit('/',1)[1] + "" + str(random.randint(1, 10000))
+            _id = k.rsplit('/',1)[1] + "_thread_" + str(hash(k.rsplit('/',1)[1])% (10 ** 8))+"_post_"+str(random.randint(1, 10000))
             final_dict[_id] = {
                 "author": person,
                 "page_url": og

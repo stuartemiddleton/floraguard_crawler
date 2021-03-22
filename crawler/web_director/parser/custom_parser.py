@@ -109,24 +109,24 @@ def create_webpage_handler():
 
 
 def text_to_regex(dict):
-    regex = r"(?i).*"
+    regex = r"(?i)"
     for _, v in dict.items():
         for i in range(0, len(v)):
             if i == 0:
-                regex += r"( " + v[i]
-            regex += r"| " + v[i]
+                regex += r"(?=.* " + v[i]
+            regex += r"|.* " + v[i]
         regex += r").*"
     return regex
 
 
 def read_txt(paths):
-    regex = r"(?i).*"
+    regex = r"(?i)"
     for path in paths:
         with open(path) as f:
             lines = f.readlines()
             for i in range(0, len(lines)):
                 if i == 0:
-                    regex += r"( " + lines[i].strip()
-                regex += r"| " + lines[i].strip()
+                    regex += r"(?=.* " + lines[i].strip()
+                regex += r"|.* " + lines[i].strip()
             regex += r").*"
     return regex
