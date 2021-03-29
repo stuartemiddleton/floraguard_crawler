@@ -113,3 +113,8 @@ class WebpageAbstractClass(ABC):
     @abstractmethod
     def attributes_regex(self):
         pass
+
+
+    @abstractmethod
+    def date_regex(self):
+        pass

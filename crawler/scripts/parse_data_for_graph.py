@@ -44,19 +44,20 @@ if __name__ == '__main__':
             }
             for comment in parsed[person]['comments'][og]:
                 ner_tags = []
-                processed = nlp(comment).sentences
+                processed = nlp(comment["comment"]).sentences
                 for sentence in processed:
                     for word in sentence.to_dict():
                         if word['ner'] != 'O':
                             ner_tags.append(word['ner'] + ":" + word['text'])
 
                 ######### CUSTOM NERS ##########
-                plants_regex = read_txt(r'../web_director/plants.txt')
-                trade_regex = read_txt(r'../web_director/trade_words.txt')
-                for words in re.findall(plants_regex, comment):
-                    ner_tags.append("NER-BANNED_PLANT:"+ words)
-                for words in re.findall(trade_regex, comment):
-                    ner_tags.append("TRADE-BEHAVIOUR:"+ words)
+                import os
+                path = r"../web_director/lexicon"
+                for file in os.listdir(path):
+                    regex = read_txt(path + "/" + file)
+                    for words in re.findall(regex,comment["comment"]):
+                        res = file.replace(".txt","").replace("_", " ").title().replace(" ", "")
+                        ner_tags.append("NER-"+res+":"+words)
                 ################################
                 final_dict[_id][str(i)] = [{"entity": ner_tags}]
                 i += 1

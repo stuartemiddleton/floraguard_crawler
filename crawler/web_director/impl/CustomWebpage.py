@@ -16,6 +16,7 @@ class CustomWebpage(WebAbstractClass.WebpageAbstractClass):
         self._profile_name_regex = {}
         self._profile_link_regex = {}
         self._attributes_regex = {}
+        self._date_regex = {}
 
     def get_root_page_url(self):
         return self.root_page_url
@@ -49,3 +50,6 @@ class CustomWebpage(WebAbstractClass.WebpageAbstractClass):
 
     def attributes_regex(self):
         return self._attributes_regex
+
+    def date_regex(self):
+        return self._date_regex

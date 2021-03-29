@@ -34,3 +34,15 @@ class MarketPlaceABC(ABC):
     @abstractmethod
     def seller_url_regex(self):
         pass
+
+    @abstractmethod
+    def price_regex(self):
+        pass
+
+    @abstractmethod
+    def date_regex(self):
+        pass
+
+    @abstractmethod
+    def attributes_regex(self):
+        pass

@@ -46,6 +46,7 @@ def create_custom_site(config):
                 webpage._profile_regex = data["profile_regex"]
                 webpage._profile_name_regex = data["profile_name_regex"]
                 webpage._profile_link_regex = data["profile_link_regex"]
+                webpage._date_regex = data["date_regex"]
                 webpage._attributes_regex = data["attributes_regex"]
                 print("Created web_director, returning result")
                 return webpage
@@ -58,7 +59,10 @@ def create_custom_site(config):
                 webpage._seller_name_regex = data["seller_name_regex"]
                 webpage._seller_description_regex = data["seller_description_regex"]
                 webpage._seller_url_regex = data["seller_url_regex"]
+                webpage._date_regex = data["date_regex"]
+                webpage._price_regex = data["price_regex"]
                 webpage._seller_block_regex = data["seller_block_regex"]
+                webpage._attributes_regex = data["attributes_regex"]
                 print("Created web_director, returning result")
                 return webpage
 
@@ -74,8 +78,8 @@ def get_comment_model(data):
     if name == "keyword":
         print("Loaded " + name + " model")
         if data['use_comment_file']:
-            print("Comment regex " + read_txt(data["comment_keyword_location"]))
-            return ContainsKeywordModel(read_txt(data["comment_keyword_location"]), comment_length=data["comment_length"])
+            print("Comment regex " + read_txt(data["comment_keyword_names"]))
+            return ContainsKeywordModel(read_txt(data["comment_keyword_names"]), comment_length=data["comment_length"])
         else:
             print("Comment regex " + text_to_regex(data["comment_keyword"]))
             return ContainsKeywordModel(text_to_regex(data["comment_keyword"]), comment_length=data["comment_length"])
@@ -122,11 +126,19 @@ def text_to_regex(dict):
 def read_txt(paths):
     regex = r"(?i)"
     for path in paths:
-        with open(path) as f:
+        with open("../crawler/web_director/lexicon/"+path) as f:
             lines = f.readlines()
-            for i in range(0, len(lines)):
-                if i == 0:
-                    regex += r"(?=.* " + lines[i].strip()
-                regex += r"|.* " + lines[i].strip()
-            regex += r").*"
+            if "excluded_terms" in path:
+                print("Excluding words in " + str(path))
+                for i in range(0, len(lines)):
+                    if i == 0:
+                        regex += r"(?!.* " + lines[i].strip()
+                    regex += r"|.* " + lines[i].strip()
+                regex += r").*"
+            else:
+                for i in range(0, len(lines)):
+                    if i == 0:
+                        regex += r"(?=.* " + lines[i].strip()
+                    regex += r"|.* " + lines[i].strip()
+                regex += r").*"
     return regex
