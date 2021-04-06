@@ -211,7 +211,7 @@ ant test.intel_viz -Dconfig=../../config/example.ini -Ddata-graph=../../corpus/e
 
 
 # Detailed description of the crawler code can be found here
-
+[PDF description](https://git.soton.ac.uk/ogie/focussed_crawler/-/blob/master/crawler/Project_ogie_code_description.pdf)
 # admin
 
 GitLab URI: https://git.soton.ac.uk/ogie/focussed_crawler.git
