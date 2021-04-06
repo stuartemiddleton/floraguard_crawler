@@ -1,19 +1,55 @@
 Ogie focussed crawler
 
-# pre-requisites
+# Running the crawler
+Before you get to this step ensure that you have 
+
+- Git installed
+- Python 3.7
+- Apache ant
+
+First step is clone the repo then CD into the repo
 
 ```
-# install apache ANT from https://ant.apache.org/
+git clone https://git.soton.ac.uk/ogie/focussed_crawler.git
+cd focussed_crawler
+```
 
-# install python 3.7 or better
+Following this we set up our environment and activate it
+```
+# win10 powershell users only (allow scripts to run)
+Set-ExecutionPolicy -Scope CurrentUser Unrestricted
 
-# install python libs
-# python >= 3.7, matplotlib >= 3.1, networkx >= 2.3
-# Earlier versions may be suitable but are untested. The software is intended to be used by someone with a basic understanding of Python so they can edit the configuration and generate a data graph JSON file.
+# make a new env folder (to store downloaded libraries etc)
+py -m venv env
 
-sudo py -m pip install matplotlib
-sudo py -m pip install networkx
+# upgrade pip (needed for cryptography install)
+py -m pip install --upgrade pip
 
+# activate env
+.\env\Scripts\activate
+
+# install all prerequisites to env
+py -m pip install -r requirements.txt
+```
+
+The configuration of the crawler is located in ```../web_directory``` ensure that the name is 'mocked'. If you want to add any further websites they should be placed in ```../web_directory/parser/custom_webpages```
+
+Next we check website configuration is correct
+
+```
+ant test.config -Dpath=../../crawler/web_director/parser/custom_webpages/mock_site.json -Dthread_url=https://sohaibkarous.wixsite.com/mock-unicorn/forum/general-discussions/unicorns-and-unee-products-for-sale 
+```
+If we see a message saying 'Success on Thread' then we can begin crawling
+
+```
+ant crawl
+```
+
+Once the crawl is completed we parse data and then visualise
+
+```
+ant parse.crawled-data -Ddata=../../crawler/exported_users/interesting_users_mocked.json
+ant viz.trial_1 -Dconfig=../../config/trial_1.ini -Ddata-graph=../../crawler/exported_users/parsed_data.json
 ```
 
 # Configuration of visualization
@@ -129,64 +165,56 @@ cd /projects-git-soton/ogie/focussed_crawler
 ant test.intel_viz -Dconfig=../../config/example.ini -Ddata-graph=../../corpus/example/example_data_graph.json
 ```
 
+# Configuration of crawler
+```
+{
+  "name": "mocked",
+  "type" : "forum",
+  "depth": "100",
+  "comment_model": "keyword",
+  "thread_model": "all",
+  "filter_comments" : true,
+  "comment_length" : 0,
+  "anonymous" : true,
+  "use_comment_file" : true,
+  "comment_keyword_names" : [
+    "plants.txt",
+    "trade_words.txt",
+    "excluded_terms.txt"
+  ],
+  "thread_keyword": {}
+}
+```
+
+
+- name - The website name you defined in the webpage configuration file 
+
+- type - Whether that website is a forum or a marketplace 
+
+- depth - How far you want the crawler to explore the website. The bigger the number the further it explores. (Note this expansion of the search is exponential e.g depth = 1 -> 30 pages, depth = 2 -> 800 pages, depth = 3 -> 30,000 pages) 
+
+- Comment_model - The model needed for directing the crawler.  
+
+- Thread_model - The model needed for directing the crawler.
+
+- Filter_comments - False to take all comments or true to only interesting ones.
+
+- Comment_length - How many comments are needed before exporting. 
+
+- Anonymous - True if you want to anonymous crawl. This hashes the username of all the individuals 
+
+- Use_comment_file - True to use lexicon files or false to create your own. 
+
+- Comment_keyword_names - This is where you input the file names of the lexicons you’ve made 
+
+- Thread_keyword - This is where you put the custom lexicon for thread titles.
+
+
+# Detailed description of the crawler code can be found here
+
 # admin
 
 GitLab URI: https://git.soton.ac.uk/ogie/focussed_crawler.git
 
 
 Contact: sem03@soton.ac.uk
-
-
-
-# Running the crawler
-Before you get to this step ensure that you have 
-
-- Git installed
-- Python 3.7
-- Apache ant
-
-First step is clone the repo then CD into the repo
-
-```
-git clone https://git.soton.ac.uk/ogie/focussed_crawler.git
-cd focussed_crawler
-```
-
-Following this we set up our environment and activate it
-```
-# win10 powershell users only (allow scripts to run)
-Set-ExecutionPolicy -Scope CurrentUser Unrestricted
-
-# make a new env folder (to store downloaded libraries etc)
-py -m venv env
-
-# upgrade pip (needed for cryptography install)
-py -m pip install --upgrade pip
-
-# activate env
-.\env\Scripts\activate
-
-# install all prerequisites to env
-py -m pip install -r requirements.txt
-```
-
-The configuration of the crawler is located in ```../web_directory``` ensure that the name is 'mocked'. If you want to add any further websites they should be placed in ```../web_directory/parser/custom_webpages```
-
-Next we check website configuration is correct
-
-```
-ant test.config -Dpath=../../crawler/web_director/parser/custom_webpages/mock_site.json -Dthread_url=https://sohaibkarous.wixsite.com/mock-unicorn/forum/general-discussions/unicorns-and-unee-products-for-sale 
-```
-If we see a message saying 'Success on Thread' then we can begin crawling
-
-```
-ant crawl
-```
-
-Once the crawl is completed we parse data and then visualise
-
-```
-ant parse.crawled-data -Ddata=../../crawler/exported_users/interesting_users_mocked.json
-ant viz.trial_1 -Dconfig=../../config/trial_1.ini -Ddata-graph=../../crawler/exported_users/parsed_data.json
-```
-

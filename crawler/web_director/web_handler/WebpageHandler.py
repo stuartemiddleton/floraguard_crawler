@@ -1,7 +1,8 @@
 import requests
 
 from bs4 import BeautifulSoup
-
+import os
+import re
 from web_director.user.Seller import SellerInfo
 from web_director.user.User import UserInfo
 from web_director.abc import MarketPlaceABC, WebAbstractClass
@@ -69,6 +70,7 @@ class WebpageHandler:
                     break
             comment = block.find(**self.webpage.comment_regex()).get_text()
             date = block.find(**self.webpage.date_regex()).get_text()
+
             if name is not None and user_link is not None:
                 if name in self.people:
                     self.people[name].add_comment(pretty(comment),
@@ -131,7 +133,12 @@ class WebpageHandler:
         seller_url = seller_block.find(**self.webpage.seller_url_regex())
         name = seller_block.find(**self.webpage.seller_name_regex())
         seller_description = soup.find(**self.webpage.seller_description_regex())
-        date = pretty(soup.find(**self.webpage.date_regex()).text)
+        date = soup.find(**self.webpage.date_regex())
+        if date is None or self.webpage.date_regex() == {}:
+            date = "NOT FOUND"
+        else:
+            date = pretty(date.text)
+
         price = pretty(soup.find(**self.webpage.price_regex()).text)
         if item_name is not None:
             print("Item: " + pretty(item_name.get_text()))
@@ -141,11 +148,11 @@ class WebpageHandler:
             else:
                 name = pretty(name.get_text())
             if seller_description is None:
-                text = "{Cant find}"
+                text = "NOT FOUND"
             else:
                 text = pretty(seller_description.get_text())
 
-            if seller_url is None:
+            if 'href' not in seller_url:
                 seller_url = {'href': "NOT FOUND"}
 
             print("Seller name: " + name)
@@ -235,6 +242,13 @@ class WebpageHandler:
             csv_export["price"] = []
             csv_export["description"] = []
 
+        ######### CUSTOM NERS ##########
+        path = r"../crawler/web_director/lexicon"
+        for file in os.listdir(path):
+            res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
+            csv_export["NER-" + res] = []
+        ################################
+
         for k, v in exported_data.items():
             for url, comments in exported_data[k]["comments"].items():
                 for comment in comments:
@@ -244,6 +258,18 @@ class WebpageHandler:
                     csv_export["profile_link"].append(exported_data[k]["profile_url"])
                     csv_export["date"].append(comment["date"])
                     csv_export["thread_title"].append(comment["thread"])
+
+                    path = r"../crawler/web_director/lexicon"
+                    for file in os.listdir(path):
+                        regex = read_txt(path + "/" + file)
+                        ner_tags = []
+                        res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
+                        for words in re.findall(regex, comment["comment"]):
+                            ner_tags.append("NER-" + res + ":" + words)
+
+                        csv_export["NER-" + res].append(ner_tags)
+                    ################################
+
                     if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
                         csv_export["price"].append(comment["price"])
                         csv_export["description"].append(comment["description"])
@@ -274,3 +300,16 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         # Create an index range for l of n items:
         yield l[i:i + n]
+
+
+def read_txt(path):
+    regex = r"(?i).*"
+    with open(path) as f:
+        lines = f.readlines()
+        for i in range(0, len(lines)):
+            if i == 0:
+                regex += r"(\b" + lines[i].strip() + r"\b"
+            else:
+                regex += r"|\b" + lines[i].strip() + r"\b"
+        regex += r").*"
+    return regex

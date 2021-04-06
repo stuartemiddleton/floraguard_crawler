@@ -9,19 +9,24 @@ def read_txt(path):
         lines = f.readlines()
         for i in range(0, len(lines)):
             if i == 0:
-                regex += r"( " + lines[i].strip()
-            regex += r"| " + lines[i].strip()
+                regex += r"(\b" + lines[i].strip()+r"\b"
+            else:
+                regex += r"|\b" + lines[i].strip()+r"\b"
         regex += r").*"
     return regex
 
 
 if __name__ == '__main__':
-    file_path = sys.argv[1]
+    parsed = {}
+    print(sys.argv)
+    for i in range(1, len(sys.argv)):
+        file_path = sys.argv[i]
+
+        with open(file_path, encoding='utf8') as f:
+            parsed.update(json.load(f))
+
     stanza.download('en')  # download English model
     nlp = stanza.Pipeline('en')  # initialize English neural pipeline
-
-    with open(file_path, encoding='utf8') as f:
-        parsed = json.load(f)
 
     new_dict = {}
     for k, v in dict(parsed).items():
@@ -61,6 +66,10 @@ if __name__ == '__main__':
                 ################################
                 final_dict[_id][str(i)] = [{"entity": ner_tags}]
                 i += 1
+
+    for file in os.listdir(path):
+        res = file.replace(".txt","").replace("_", " ").title().replace(" ", "")
+        print("CUSTOM NER: " + "NER-" + res)
 
     with open(r'../exported_users/parsed_data.json', 'w') as fp:
         json.dump(final_dict, fp)

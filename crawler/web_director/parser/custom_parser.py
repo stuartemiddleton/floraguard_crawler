@@ -34,7 +34,7 @@ def create_custom_site(config):
             data = json.load(json_file)
             if data["name"] not in name:
                 continue
-            if data["type"] == "forum":
+            if config["type"] == "forum":
                 webpage = CustomWebpage(data["name"])
                 webpage.root_page_url = data["root_page_url"]
                 webpage.general_profile_url = data["general_profile_url"]
@@ -50,7 +50,7 @@ def create_custom_site(config):
                 webpage._attributes_regex = data["attributes_regex"]
                 print("Created web_director, returning result")
                 return webpage
-            if data["type"] == "marketplace":
+            if config["type"] == "marketplace":
                 webpage = CustomMarketPlace(data["name"])
                 webpage.root_page_url = data["root_page_url"]
                 webpage.general_start_page_url = data["general_items_url"]
@@ -117,8 +117,8 @@ def text_to_regex(dict):
     for _, v in dict.items():
         for i in range(0, len(v)):
             if i == 0:
-                regex += r"(?=.* " + v[i]
-            regex += r"|.* " + v[i]
+                regex += r"(?=.*\b" + v[i]
+            regex += r"|.*\b" + v[i]
         regex += r").*"
     return regex
 
@@ -132,13 +132,16 @@ def read_txt(paths):
                 print("Excluding words in " + str(path))
                 for i in range(0, len(lines)):
                     if i == 0:
-                        regex += r"(?!.* " + lines[i].strip()
-                    regex += r"|.* " + lines[i].strip()
-                regex += r").*"
+                        regex += r"(?!^.*\b" + lines[i].strip()+ r"\b"
+                    else:
+                        regex += r"|^.*\b" + lines[i].strip()+ r"\b"
+                regex += r")"
             else:
                 for i in range(0, len(lines)):
                     if i == 0:
-                        regex += r"(?=.* " + lines[i].strip()
-                    regex += r"|.* " + lines[i].strip()
-                regex += r").*"
-    return regex
+                        regex += r"(?=^.*\b" + lines[i].strip()+ r"\b"
+                    else:
+                        regex += r"|^.*\b" + lines[i].strip()+ r"\b"
+                regex += r")"
+
+    return regex+r".*"

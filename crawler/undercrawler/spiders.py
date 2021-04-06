@@ -450,6 +450,7 @@ def allowed_re(url, hard_url_constraint):
     >>> bool(allowed_re('http://blog.example.com', False).match('http://news.example.com'))
     False
     """
+
     if not hard_url_constraint:
         p = urlsplit(url)
         url = '{}://{}'.format(p.scheme, p.netloc)
@@ -458,7 +459,9 @@ def allowed_re(url, hard_url_constraint):
     url = re.sub(http_www, '', url)
     if hard_url_constraint:
         p = urlsplit('http://' + url)
-        if len(p.netloc.split('.')) > 2:
+
+        # Had to increase this line to 3 to handle .co.za links
+        if len(p.netloc.split('.')) > 3:
             regexp_prefix = http
         else:
             regexp_prefix = http_www
