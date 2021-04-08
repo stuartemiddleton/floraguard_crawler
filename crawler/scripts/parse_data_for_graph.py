@@ -5,7 +5,7 @@ import stanza
 import re
 def read_txt(path):
     regex = r"(?i).*"
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         lines = f.readlines()
         for i in range(0, len(lines)):
             if i == 0:

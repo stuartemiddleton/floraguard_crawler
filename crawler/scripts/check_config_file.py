@@ -27,7 +27,7 @@ if __name__ == '__main__':
     print("===================Testing configuration on thread===================")
     people = []
     page = requests.get(thread_url).text
-    soup = BeautifulSoup(page, 'html.parser')
+    soup = BeautifulSoup(page, 'html.parser',from_encoding='utf-8')
     block_list = soup.find_all(**site['block_regex'])
     print("Identified " + str(len(block_list)) + " blocks")
     for block in block_list:

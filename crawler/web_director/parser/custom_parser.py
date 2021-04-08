@@ -66,7 +66,6 @@ def create_custom_site(config):
                 print("Created web_director, returning result")
                 return webpage
 
-
     raise Exception("Cannot find custom site")
 
 
@@ -120,28 +119,28 @@ def text_to_regex(dict):
                 regex += r"(?=.*\b" + v[i]
             regex += r"|.*\b" + v[i]
         regex += r").*"
-    return regex
+    return str(regex.encode("utf-8"))
 
 
 def read_txt(paths):
     regex = r"(?i)"
     for path in paths:
-        with open("../crawler/web_director/lexicon/"+path) as f:
+        with open("../crawler/web_director/lexicon/" + path, encoding='utf-8') as f:
             lines = f.readlines()
             if "excluded_terms" in path:
                 print("Excluding words in " + str(path))
                 for i in range(0, len(lines)):
                     if i == 0:
-                        regex += r"(?!^.*\b" + lines[i].strip()+ r"\b"
+                        regex += r"(?!^.*\b" + lines[i].strip() + r"\b"
                     else:
-                        regex += r"|^.*\b" + lines[i].strip()+ r"\b"
+                        regex += r"|^.*\b" + lines[i].strip() + r"\b"
                 regex += r")"
             else:
                 for i in range(0, len(lines)):
                     if i == 0:
-                        regex += r"(?=^.*\b" + lines[i].strip()+ r"\b"
+                        regex += r"(?=^.*\b" + lines[i].strip() + r"\b"
                     else:
-                        regex += r"|^.*\b" + lines[i].strip()+ r"\b"
+                        regex += r"|^.*\b" + lines[i].strip() + r"\b"
                 regex += r")"
-
-    return regex+r".*"
+    regex += r".*"
+    return str(regex.encode("utf-8"))

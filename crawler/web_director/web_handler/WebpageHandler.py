@@ -51,7 +51,7 @@ class WebpageHandler:
     """
 
     def thread_page_handler(self, page, url):
-        soup = BeautifulSoup(page, 'html.parser')
+        soup = BeautifulSoup(page, 'html.parser', from_encoding='utf-8')
         self.crawler_stats["Threads seen"] += 1
         block_list = soup.find_all(**self.webpage.block_regex())
         print("On page, block amount", len(block_list))
@@ -63,26 +63,26 @@ class WebpageHandler:
                 user_name = profile.find(**self.webpage.profile_name_regex())
                 user_link = profile.find(**self.webpage.profile_link_regex())
                 if user_name and user_link is not None:
-                    name = user_name.text
+                    name = str(user_name.text.encode('utf-8'))
                     if self.anonymous:
                         # Hashing name if anonymous is active
                         name = str(abs(hash(name)) % (10 ** 8))
                     break
-            comment = block.find(**self.webpage.comment_regex()).get_text()
+            comment = pretty(block.find(**self.webpage.comment_regex()).get_text().encode('utf-8'))
             date = block.find(**self.webpage.date_regex()).get_text()
 
             if name is not None and user_link is not None:
                 if name in self.people:
-                    self.people[name].add_comment(pretty(comment),
-                                                  soup.find(**self.webpage.thread_name_regex()).text, url, date)
+                    self.people[name].add_comment(comment,
+                                                  str(soup.find(**self.webpage.thread_name_regex()).text.encode('utf-8')), url, date)
                 else:
                     person = UserInfo(name, url_fixer(user_link['href']))
-                    person.add_comment(pretty(comment), soup.find(**self.webpage.thread_name_regex()).text, url, date)
+                    person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text.encode('utf-8')), url, date)
                     self.people[name] = person
 
         for link in self.direct_crawler():
             self.crawler_stats["Profiles scraped"] += 1
-            self.process(requests.get(link).text, link)
+            self.process(str(requests.get(link).text.encode('utf-8')), link)
 
     """
         Extracts the attributes of the commenter 
@@ -122,7 +122,7 @@ class WebpageHandler:
 
     def item_page_handler(self, page, url):
         print("On item page")
-        soup = BeautifulSoup(page, 'html.parser')
+        soup = BeautifulSoup(page, 'html.parser', from_encoding='utf-8')
         item_name = soup.find(**self.webpage.sale_item_name_regex())
 
         seller_block = soup.find(**self.webpage.seller_block_regex())
@@ -137,40 +137,40 @@ class WebpageHandler:
         if date is None or self.webpage.date_regex() == {}:
             date = "NOT FOUND"
         else:
-            date = pretty(date.text)
+            date = pretty(str(date.text.encode('utf-8')))
 
-        price = pretty(soup.find(**self.webpage.price_regex()).text)
+        price = pretty(soup.find(**self.webpage.price_regex()).text.encode('utf-8'))
         if item_name is not None:
-            print("Item: " + pretty(item_name.get_text()))
+            print("Item: " + pretty(item_name.get_text().encode('utf-8')))
 
             if name is None:
                 name = "NOT FOUND"
             else:
-                name = pretty(name.get_text())
+                name = pretty(name.get_text().encode('utf-8'))
             if seller_description is None:
                 text = "NOT FOUND"
             else:
-                text = pretty(seller_description.get_text())
+                text = pretty(seller_description.get_text().encode('utf-8'))
 
             if 'href' not in seller_url:
                 seller_url = {'href': "NOT FOUND"}
 
             print("Seller name: " + name)
             # print("Seller url: " + seller_url['href'])
-            print("Seller decr: " + pretty(text))
+            print("Seller decr: " + text)
 
             if name in self.people:
-                self.people[name].add_item(url, pretty(text), date, price, pretty(item_name.get_text()))
+                self.people[name].add_item(url, text, date, price, pretty(item_name.get_text().encode('utf-8')))
                 for n, regex in self.webpage.attributes_regex().items():
                     for data in soup.find_all(**regex):
-                        self.people[name].add_attribute(n, data.get_text())
+                        self.people[name].add_attribute(n, pretty(data.get_text().encode('utf-8')))
             else:
                 person = SellerInfo(name, url_fixer(seller_url['href']))
-                person.add_item(url, pretty(text), date, price, pretty(item_name.get_text()))
+                person.add_item(url, text, date, price, pretty(item_name.get_text().encode('utf-8')))
                 self.people[name] = person
                 for n, regex in self.webpage.attributes_regex().items():
                     for data in soup.find_all(**regex):
-                        self.people[name].add_attribute(n, data.get_text())
+                        self.people[name].add_attribute(n, pretty(data.get_text().encode('utf-8')))
 
         self.direct_crawler()
 
@@ -280,6 +280,7 @@ class WebpageHandler:
 
 def pretty(string):
     import re
+    string = str(string.decode())
     return re.sub(' +', ' ', string.replace('\n', ' ').replace('\r', '').replace('\t', '')).rstrip().lstrip()
 
 
@@ -304,7 +305,7 @@ def chunks(l, n):
 
 def read_txt(path):
     regex = r"(?i).*"
-    with open(path) as f:
+    with open(path, encoding='utf-8') as f:
         lines = f.readlines()
         for i in range(0, len(lines)):
             if i == 0:
