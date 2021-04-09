@@ -63,13 +63,17 @@ class WebpageHandler:
                 user_name = profile.find(**self.webpage.profile_name_regex())
                 user_link = profile.find(**self.webpage.profile_link_regex())
                 if user_name and user_link is not None:
-                    name = str(user_name.text.encode('utf-8'))
+                    name = pretty(user_name.text.encode('utf-8'))
                     if self.anonymous:
                         # Hashing name if anonymous is active
                         name = str(abs(hash(name)) % (10 ** 8))
                     break
+
+            if block.find(**self.webpage.comment_regex()) is None:
+                continue
+
             comment = pretty(block.find(**self.webpage.comment_regex()).get_text().encode('utf-8'))
-            date = block.find(**self.webpage.date_regex()).get_text()
+            date = block.find(**self.webpage.date_regex()).text
 
             if name is not None and user_link is not None:
                 if name in self.people:
@@ -137,11 +141,11 @@ class WebpageHandler:
         if date is None or self.webpage.date_regex() == {}:
             date = "NOT FOUND"
         else:
-            date = pretty(str(date.text.encode('utf-8')))
+            date = pretty(date.text.encode('utf-8'))
 
         price = pretty(soup.find(**self.webpage.price_regex()).text.encode('utf-8'))
         if item_name is not None:
-            print("Item: " + pretty(item_name.get_text().encode('utf-8')))
+            # print("Item: " + pretty(item_name.get_text().encode('utf-8')))
 
             if name is None:
                 name = "NOT FOUND"
@@ -155,9 +159,9 @@ class WebpageHandler:
             if 'href' not in seller_url:
                 seller_url = {'href': "NOT FOUND"}
 
-            print("Seller name: " + name)
+            # print("Seller name: " + name)
             # print("Seller url: " + seller_url['href'])
-            print("Seller decr: " + text)
+            # print("Seller decr: " + text)
 
             if name in self.people:
                 self.people[name].add_item(url, text, date, price, pretty(item_name.get_text().encode('utf-8')))
@@ -265,7 +269,7 @@ class WebpageHandler:
                         ner_tags = []
                         res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
                         for words in re.findall(regex, comment["comment"]):
-                            ner_tags.append("NER-" + res + ":" + words)
+                            ner_tags.append("NER-" + res + ":" + str(words))
 
                         csv_export["NER-" + res].append(ner_tags)
                     ################################

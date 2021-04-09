@@ -77,10 +77,10 @@ def get_comment_model(data):
     if name == "keyword":
         print("Loaded " + name + " model")
         if data['use_comment_file']:
-            print("Comment regex " + read_txt(data["comment_keyword_names"]))
+            # print("Comment regex " + read_txt(data["comment_keyword_names"]))
             return ContainsKeywordModel(read_txt(data["comment_keyword_names"]), comment_length=data["comment_length"])
         else:
-            print("Comment regex " + text_to_regex(data["comment_keyword"]))
+            # print("Comment regex " + text_to_regex(data["comment_keyword"]))
             return ContainsKeywordModel(text_to_regex(data["comment_keyword"]), comment_length=data["comment_length"])
     if name == "all":
         print("Loaded " + name + " model")
@@ -93,7 +93,7 @@ def get_thread_model(data):
     name = data["thread_model"]
     if name == "keyword":
         print("Loaded " + name + " model")
-        print("Thread regex " + text_to_regex(data["thread_keyword"]))
+        # print("Thread regex " + text_to_regex(data["thread_keyword"]))
         return ContainsKeywordModel(text_to_regex(data["thread_keyword"]), comment_length=data["comment_length"])
     if name == "all":
         print("Loaded " + name + " model")
@@ -143,4 +143,4 @@ def read_txt(paths):
                         regex += r"|^.*\b" + lines[i].strip() + r"\b"
                 regex += r")"
     regex += r".*"
-    return str(regex.encode("utf-8"))
+    return regex.encode("utf-8").decode()
