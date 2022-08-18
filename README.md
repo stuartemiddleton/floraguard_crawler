@@ -5,7 +5,9 @@ The FloraGuard crawler is designed to crawl online discussion forums and marketp
 This work was funded by the ESRC FloraGuard project (ES/R003254/1) and DEFRA Illegal Wildlife Trade Challenge Fund project (https://iwt.challengefund.org.uk/project/XXIWT114/).
 
 This work can be cited as:
+
 Middleton, S.E. Lavorgna, L. Neumann, G. Whitehead, D. Information Extraction from the Long Tail: A Socio-Technical AI Approach for Criminology Investigations into the Online Illegal Plant Trade, In 12th ACM Conference on Web Science (WebSci ’20 Companion), July 6–10, 2020, Southampton, United Kingdom. ACM, New York, NY, USA, 7 pages. https://doi.org/10.1145/3394332.3402838
+
 Whitehead, D. Cowell, C.R. Lavorgna, A. Middleton, S.E. Countering plant crime online: Cross-disciplinary collaboration in the FloraGuard study, Forensic Science International: Animals and Environments, Volume 1, Elsevier, 2021. https://doi.org/10.1016/j.fsiae.2021.100007
 
 # Installation under Win10
