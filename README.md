@@ -1,10 +1,12 @@
 ## FloraGuard crawler
 
-The FloraGuard crawler is designed to crawl online discussion forums and marketplaces connected to the illegal wildlife trade (IWT). It is build on top of the DARPA MEMEX undercrawler software (https://github.com/TeamHG-Memex/undercrawler) and includes configuration to define relevance patterns to help focus posts crawled to those connected to the online trade of wildlife.
+The FloraGuard crawler is designed to crawl online discussion forums and marketplaces connected to the illegal wildlife trade (IWT). It is build on top of the DARPA MEMEX undercrawler software (https://github.com/TeamHG-Memex/undercrawler) and includes configuration to define relevance patterns to help focus posts crawled.
 
-This work was funded by the ESRC FloraGuard project (ES/R003254/1) and DEFRA Illegal Wildlife Trade Challenge Fund project (https://iwt.challengefund.org.uk/project/XXIWT114/). This is a mixed IPR repository with software created by University of Southampton (individually from FloraGuard project), and jointly created by University of Southampton and Royal Botanic Gardens, Kew (Illegal Wildlife Trade Challenge Fund project). The software copyright headers contain details.
+This work was funded by the ESRC FloraGuard project (ES/R003254/1) and DEFRA Illegal Wildlife Trade Challenge Fund project (https://iwt.challengefund.org.uk/project/XXIWT114/). This is a mixed IPR repository with software created by University of Southampton (individually from FloraGuard project), and jointly created by University of Southampton and Royal Botanic Gardens, Kew (Illegal Wildlife Trade Challenge Fund project). The software copyright headers contain more details.
 
-Software is released royalty-free under a 4-clause BSD open scource license included in this repository.
+This software is released royalty-free under a 4-clause BSD open source license included in this repository.
+
+Training material for legitimate IWT stakeholders and researchers can be obtained for free via a registration process setup by Royal Botanic Gardens, Kew (email TODO EMAIL FOR REGISTRATION).
 
 This work can be cited as:
 
