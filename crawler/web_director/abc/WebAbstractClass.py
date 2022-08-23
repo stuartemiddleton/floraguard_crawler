@@ -1,8 +1,22 @@
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+######################################################################
+#
+# (c) Copyright University of Southampton, 2022
+# # Copyright in this software belongs to University of Southampton,
+# Highfield, University Road, Southampton SO17 1BJ
+#
+# Created By : Sohaib Karous
+# Created Date : 2022/08/18
+# Project : FloraGuard
+# ######################################################################
+
 from abc import ABC, abstractmethod
 
 """
     Abstract class which each new website inherits, by providing the basic functions in this
-    class, any implemtation of this class can be used for the directed crawler. Filling out 
+    class, any implementation of this class can be used for the directed crawler. Filling out 
     this class is a simple task.
     
 """

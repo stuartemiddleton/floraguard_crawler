@@ -1,3 +1,20 @@
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+######################################################################
+#
+# (c) Copyright University of Southampton and Royal Botanic Gardens, Kew, 2022
+#
+# Copyright in this software belongs to University of Southampton
+# Highfield, University Road, Southampton SO17 1BJ
+# and
+# Royal Botanic Gardens, Kew # Kew, Richmond, London, TW9 3AE
+#
+# Created By : Alex Kazaryan
+# Created Date : 2022/08/18
+# Project : Illegal Wildlife Trade Challenge Fund project IWT114
+# ######################################################################
+
 import requests
 
 from bs4 import BeautifulSoup
@@ -7,12 +24,15 @@ from web_director.user.Seller import SellerInfo
 from web_director.user.User import UserInfo
 from web_director.abc import MarketPlaceABC, WebAbstractClass
 
+import logging
+import dateutil.parser as dparser
+from datetime import datetime
 
 class WebpageHandler:
 
     def __init__(self, webpage, thread_model, comment_model, filter_comments, anonymous):
-        if anonymous:
-            print("Anonymous crawling active")
+        if anonymous: logging.info("Anonymous crawling active")
+
         self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0}
         self.webpage = webpage
         self.thread_model = thread_model
@@ -26,46 +46,55 @@ class WebpageHandler:
         Given the page content, processes the html
         Returns True or False if it should extract all the URLS on that page
     """
-
     def process(self, page, url):
+        # Forum
         if issubclass(self.webpage.__class__, WebAbstractClass.WebpageAbstractClass):
+
+            # Thread page
             if self.webpage.get_general_page_url() in url:
                 if self.important_thread(page):
                     self.thread_page_handler(page, url)
                     return True
                 return False
 
+            # Profile page
             if self.webpage.get_general_profile_url() in url:
                 self.profile_page_handler(page)
 
             return True
+
+        # Marketplace
         elif issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
             if self.webpage.get_general_page_url() in url:
                 self.item_page_handler(page, url)
                 return False
         return True
 
+    #############################################################################################################
     ######################################### FORUM HANDLERS ####################################################
+    #############################################################################################################
+
     """
         Extracts the comments and commenter from the page while storing it
     """
-
     def thread_page_handler(self, page, url):
         soup = BeautifulSoup(page, 'html.parser', from_encoding='utf-8')
         self.crawler_stats["Threads seen"] += 1
         block_list = soup.find_all(**self.webpage.block_regex())
-        print("On page, block amount", len(block_list))
         for block in block_list:
             user_link = None
             name = None
 
             for profile in block.find_all(**self.webpage.profile_regex()):
+                # Get the html username & profile link
                 user_name = profile.find(**self.webpage.profile_name_regex())
                 user_link = profile.find(**self.webpage.profile_link_regex())
+
                 if user_name and user_link is not None:
                     name = pretty(user_name.text.encode('utf-8'))
+
+                    # Hashing name if anonymous is active
                     if self.anonymous:
-                        # Hashing name if anonymous is active
                         name = str(abs(hash(name)) % (10 ** 8))
                     break
 
@@ -73,15 +102,21 @@ class WebpageHandler:
                 continue
 
             comment = pretty(block.find(**self.webpage.comment_regex()).get_text().encode('utf-8'))
-            date = block.find(**self.webpage.date_regex()).text
+            date = dparser.parse(block.find(**self.webpage.date_regex()).text,fuzzy=True).strftime("%d %b, %Y")
 
+            # Creating a new Person & their comment (if person already exists then just adding the comment)
             if name is not None and user_link is not None:
-                if name in self.people:
-                    self.people[name].add_comment(comment,
-                                                  str(soup.find(**self.webpage.thread_name_regex()).text.encode('utf-8')), url, date)
+                # Existing User
+                if name in self.people and comment not in self.people[name].get_all_comments():
+                    self.people[name].add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
+                # New User
                 else:
-                    person = UserInfo(name, url_fixer(user_link['href']))
-                    person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text.encode('utf-8')), url, date)
+                    user_link_href = user_link['href']
+
+                    if user_link_href.startswith('./'):
+                        user_link_href = self.webpage.root_page_url + user_link_href[2:]
+                    person = UserInfo(name, user_link_href)
+                    person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
                     self.people[name] = person
 
         for link in self.direct_crawler():
@@ -116,16 +151,19 @@ class WebpageHandler:
         title = soup.find(**self.webpage.thread_name_regex())
         if title is None:
             return True
-        interesting = self.thread_model.accept(title.text)
-        return interesting
 
-    ######################################### MARKETPLACE HANDLERS ####################################################
+        return self.thread_model.accept(title.text)
+
+    #############################################################################################################
+    ######################################### MARKETPLACE HANDLERS ##############################################
     # This is a hack solution for the marketplace stuff, not really the best approach but the crawler was not
     # designed for marketplaces. A whole refactor of the code would take way too long and honestly I just dont
     # think that it is worth it
+    #############################################################################################################
+    #############################################################################################################
 
     def item_page_handler(self, page, url):
-        print("On item page")
+        #print("On item page")
         soup = BeautifulSoup(page, 'html.parser', from_encoding='utf-8')
         item_name = soup.find(**self.webpage.sale_item_name_regex())
 
@@ -133,7 +171,7 @@ class WebpageHandler:
         if seller_block is None:
             return
 
-        print("Found seller block")
+        #print("Found seller block")
         seller_url = seller_block.find(**self.webpage.seller_url_regex())
         name = seller_block.find(**self.webpage.seller_name_regex())
         seller_description = soup.find(**self.webpage.seller_description_regex())
@@ -143,7 +181,9 @@ class WebpageHandler:
         else:
             date = pretty(date.text.encode('utf-8'))
 
-        price = pretty(soup.find(**self.webpage.price_regex()).text.encode('utf-8'))
+        price_block = soup.find(**self.webpage.price_regex())
+        price = pretty(price_block.get_text().encode('utf-8'))
+
         if item_name is not None:
             # print("Item: " + pretty(item_name.get_text().encode('utf-8')))
 
@@ -189,11 +229,12 @@ class WebpageHandler:
                 continue
             else:
                 if self.comment_model.accept(person.get_all_comments()):
-                    print(username)
-                    print("INTERESTING USER: " + username)
-                    profile_links.append(self.webpage.root_page_url + person.get_profile_url())
+                    logging.info("INTERESTING USER: " + str(username))
+                    logging.info("URL: " + str(person.get_profile_url()))
+                    profile_links.append(person.get_profile_url())
                     self.interesting_people.append(username)
                     self.finish()
+                    logging.info('*** Saved ***')
 
         return profile_links
 
@@ -226,18 +267,15 @@ class WebpageHandler:
                     "exported_date": datetime.date.today().isoformat(),
                     "username": person,
                     "comments": comments,
-                    "profile_url": self.webpage.root_page_url + self.people[person].get_profile_url()
+                    "profile_url": self.people[person].get_profile_url()
                 }, **self.people[person].attributes}
 
         import json
-        print(exported_data)
         with open(r'..\crawler\exported_users\interesting_users_' + self.webpage.name + '.json', 'w') as fp:
             json.dump(exported_data, fp)
 
         self.csv_export(exported_data)
 
-        print(self.interesting_people)
-        print(self.crawler_stats)
 
     def csv_export(self, exported_data):
         import pandas
@@ -281,12 +319,13 @@ class WebpageHandler:
         df = pandas.DataFrame(csv_export)
         df.to_csv(r'..\crawler\exported_users\interesting_users_' + self.webpage.name + '.csv')
 
-
-def pretty(string):
+def pretty(s):
     import re
-    string = str(string.decode())
-    return re.sub(' +', ' ', string.replace('\n', ' ').replace('\r', '').replace('\t', '')).rstrip().lstrip()
+    import demoji
 
+    s = demoji.replace_with_desc(str(s.decode("utf-8","ignore")))
+
+    return re.sub(' +', ' ', s.replace('\n', ' ').replace('\r', '').replace('\t', '')).rstrip().lstrip()
 
 def url_fixer(string):
     if string[0] is not "/":
