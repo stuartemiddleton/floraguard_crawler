@@ -1,0 +1,41 @@
+Copyright (c) 2022, University of Southampton and Royal Botanic Gardens, Kew
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code or data must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+3. All advertising and publication materials containing results from the use
+   of this software or data must acknowledge the University of Southampton and Royal Botanic Gardens, Kew
+   and cite the following papers which describes the software and methodology:
+
+	Middleton, S.E. Lavorgna, L. Neumann, G. Whitehead, D.
+	Information Extraction from the Long Tail: A Socio-Technical AI Approach for Criminology Investigations into the Online Illegal Plant Trade,
+	In 12th ACM Conference on Web Science (WebSci ’20 Companion), July 6–10, 2020, Southampton, United Kingdom. ACM, New York, NY, USA, 7 pages.
+	https://doi.org/10.1145/3394332.3402838
+
+	Whitehead, D. Cowell, C.R. Lavorgna, A. Middleton, S.E.
+	Countering plant crime online: Cross-disciplinary collaboration in the FloraGuard study,
+	Forensic Science International: Animals and Environments, Volume 1, Elsevier, 2021.
+	https://doi.org/10.1016/j.fsiae.2021.100007
+
+4. Neither the name of the University of Southampton, Royal Botanic Gardens, Kew nor the
+   names of its contributors may be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE AND DATA IS PROVIDED BY University of Southampton and Royal Botanic Gardens, Kew
+''AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL University of Southampton BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
