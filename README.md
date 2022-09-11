@@ -15,7 +15,7 @@ Middleton, S.E. Lavorgna, L. Neumann, G. Whitehead, D. Information Extraction fr
 Whitehead, D. Cowell, C.R. Lavorgna, A. Middleton, S.E. Countering plant crime online: Cross-disciplinary collaboration in the FloraGuard study, Forensic Science International: Animals and Environments, Volume 1, Elsevier, 2021. https://doi.org/10.1016/j.fsiae.2021.100007
 
 # Installation for Windows 10/11
-###Step 1. Install the prerequisites *
+## Step 1. Install the prerequisites *
 - [Python 3.7.9](https://www.python.org/downloads/release/python-379/)
 - [Java SE Development Kit 18](https://www.oracle.com/java/technologies/downloads/#jdk18-windows)
 - [Apache Ant 1.10.12](https://ant.apache.org/bindownload.cgi)
