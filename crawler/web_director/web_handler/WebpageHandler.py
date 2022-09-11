@@ -1,7 +1,7 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-######################################################################
+###########################################################################################################
 #
 # (c) Copyright University of Southampton and Royal Botanic Gardens, Kew, 2022
 #
@@ -13,43 +13,44 @@
 # Created By : Alex Kazaryan
 # Created Date : 2022/08/18
 # Project : Illegal Wildlife Trade Challenge Fund project IWT114
-# ######################################################################
+# ###########################################################################################################
 
-import requests
 
-from bs4 import BeautifulSoup
 import os
 import re
+import requests
+import logging
+import dateutil.parser as dparser
+from bs4 import BeautifulSoup
+from datetime import datetime
 from web_director.user.Seller import SellerInfo
 from web_director.user.User import UserInfo
 from web_director.abc import MarketPlaceABC, WebAbstractClass
 
-import logging
-import dateutil.parser as dparser
-from datetime import datetime
 
 class WebpageHandler:
 
-    def __init__(self, webpage, thread_model, comment_model, filter_comments, anonymous):
-        if anonymous: logging.info("Anonymous crawling active")
+    def __init__(self, webpage, thread_model, comment_model, comment_keyword_names, filter_comments, anonymous):
+        if anonymous: logging.info("Anonymous crawling activated")
 
         self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0}
         self.webpage = webpage
         self.thread_model = thread_model
         self.comment_model = comment_model
+        self.comment_keyword_names = comment_keyword_names
         self.people = {}
         self.interesting_people = []
         self.anonymous = anonymous
         self.filter_comments = filter_comments
 
-    """
-        Given the page content, processes the html
-        Returns True or False if it should extract all the URLS on that page
-    """
+
+    """ -----------------------------------------------------------------------------------
+    * Given the page content & URL, processes the html.
+    * Returns True if all URLS on the page should be extracted, False otherwise.
+    * --------------------------------------------------------------------------------- """
     def process(self, page, url):
         # Forum
         if issubclass(self.webpage.__class__, WebAbstractClass.WebpageAbstractClass):
-
             # Thread page
             if self.webpage.get_general_page_url() in url:
                 if self.important_thread(page):
@@ -60,7 +61,6 @@ class WebpageHandler:
             # Profile page
             if self.webpage.get_general_profile_url() in url:
                 self.profile_page_handler(page)
-
             return True
 
         # Marketplace
@@ -71,12 +71,12 @@ class WebpageHandler:
         return True
 
     #############################################################################################################
-    ######################################### FORUM HANDLERS ####################################################
+    ############################################## FORUM HANDLERS ###############################################
     #############################################################################################################
 
-    """
-        Extracts the comments and commenter from the page while storing it
-    """
+    """ -----------------------------------------------------------------------------------
+    * Extracts the comments and commenter from the page while storing it
+    * --------------------------------------------------------------------------------- """
     def thread_page_handler(self, page, url):
         soup = BeautifulSoup(page, 'html.parser', from_encoding='utf-8')
         self.crawler_stats["Threads seen"] += 1
@@ -91,17 +91,18 @@ class WebpageHandler:
                 user_link = profile.find(**self.webpage.profile_link_regex())
 
                 if user_name and user_link is not None:
-                    name = pretty(user_name.text.encode('utf-8'))
+                    name = pretty(user_name.text)
 
                     # Hashing name if anonymous is active
                     if self.anonymous:
                         name = str(abs(hash(name)) % (10 ** 8))
+                        user_link = "NOT FOUND"
                     break
 
             if block.find(**self.webpage.comment_regex()) is None:
                 continue
 
-            comment = pretty(block.find(**self.webpage.comment_regex()).get_text().encode('utf-8'))
+            comment = pretty(block.find(**self.webpage.comment_regex()).get_text())
             date = dparser.parse(block.find(**self.webpage.date_regex()).text,fuzzy=True).strftime("%d %b, %Y")
 
             # Creating a new Person & their comment (if person already exists then just adding the comment)
@@ -115,6 +116,7 @@ class WebpageHandler:
 
                     if user_link_href.startswith('./'):
                         user_link_href = self.webpage.root_page_url + user_link_href[2:]
+
                     person = UserInfo(name, user_link_href)
                     person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
                     self.people[name] = person
@@ -168,53 +170,56 @@ class WebpageHandler:
         item_name = soup.find(**self.webpage.sale_item_name_regex())
 
         seller_block = soup.find(**self.webpage.seller_block_regex())
-        if seller_block is None:
-            return
 
-        #print("Found seller block")
         seller_url = seller_block.find(**self.webpage.seller_url_regex())
         name = seller_block.find(**self.webpage.seller_name_regex())
         seller_description = soup.find(**self.webpage.seller_description_regex())
+
         date = soup.find(**self.webpage.date_regex())
         if date is None or self.webpage.date_regex() == {}:
             date = "NOT FOUND"
         else:
-            date = pretty(date.text.encode('utf-8'))
+            date = pretty(date.text)
 
         price_block = soup.find(**self.webpage.price_regex())
-        price = pretty(price_block.get_text().encode('utf-8'))
+        price = pretty(price_block.get_text())
 
         if item_name is not None:
-            # print("Item: " + pretty(item_name.get_text().encode('utf-8')))
 
             if name is None:
                 name = "NOT FOUND"
             else:
-                name = pretty(name.get_text().encode('utf-8'))
+                name = pretty(name.get_text())
+                # Hashing name if anonymous is active
+                if self.anonymous:
+                    name = str(abs(hash(name)) % (10 ** 8))
+
             if seller_description is None:
                 text = "NOT FOUND"
             else:
-                text = pretty(seller_description.get_text().encode('utf-8'))
+                if self.webpage.root_page_url == "https://www.ebay.com/":
+                    text = pretty(BeautifulSoup(requests.get(seller_description["src"]).content, "html.parser").get_text())
+                else:
+                    text = pretty(seller_description.get_text())
 
-            if 'href' not in seller_url:
-                seller_url = {'href': "NOT FOUND"}
-
-            # print("Seller name: " + name)
-            # print("Seller url: " + seller_url['href'])
-            # print("Seller decr: " + text)
+            if seller_url is None or self.webpage.seller_url_regex() == {} or self.anonymous:
+                seller_url = "NOT FOUND"
+            else:
+                seller_url = seller_url['href']
 
             if name in self.people:
-                self.people[name].add_item(url, text, date, price, pretty(item_name.get_text().encode('utf-8')))
+                self.people[name].add_item(url, text, date, price, pretty(item_name.get_text()))
                 for n, regex in self.webpage.attributes_regex().items():
                     for data in soup.find_all(**regex):
-                        self.people[name].add_attribute(n, pretty(data.get_text().encode('utf-8')))
+                        self.people[name].add_attribute(n, pretty(data.get_text()))
             else:
-                person = SellerInfo(name, url_fixer(seller_url['href']))
-                person.add_item(url, text, date, price, pretty(item_name.get_text().encode('utf-8')))
+
+                person = SellerInfo(name, seller_url)
+                person.add_item(url, text, date, price, pretty(item_name.get_text()))
                 self.people[name] = person
                 for n, regex in self.webpage.attributes_regex().items():
                     for data in soup.find_all(**regex):
-                        self.people[name].add_attribute(n, pretty(data.get_text().encode('utf-8')))
+                        self.people[name].add_attribute(n, pretty(data.get_text()))
 
         self.direct_crawler()
 
@@ -280,20 +285,24 @@ class WebpageHandler:
     def csv_export(self, exported_data):
         import pandas
         csv_export = {"user": [], "comment": [], "thread_url": [], "profile_link": [], "thread_title": [], "date": []}
+        ners = []
+
         if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
             csv_export["price"] = []
             csv_export["description"] = []
 
         ######### CUSTOM NERS ##########
         path = r"../crawler/web_director/lexicon"
-        for file in os.listdir(path):
+        for file in self.comment_keyword_names:
             res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
             csv_export["NER-" + res] = []
+            ners.append("NER-" + res)
         ################################
 
         for k, v in exported_data.items():
             for url, comments in exported_data[k]["comments"].items():
                 for comment in comments:
+
                     csv_export["user"].append(k)
                     csv_export["comment"].append(comment["comment"])
                     csv_export["thread_url"].append(url)
@@ -302,7 +311,8 @@ class WebpageHandler:
                     csv_export["thread_title"].append(comment["thread"])
 
                     path = r"../crawler/web_director/lexicon"
-                    for file in os.listdir(path):
+
+                    for file in self.comment_keyword_names:
                         regex = read_txt(path + "/" + file)
                         ner_tags = []
                         res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
@@ -316,14 +326,32 @@ class WebpageHandler:
                         csv_export["price"].append(comment["price"])
                         csv_export["description"].append(comment["description"])
 
+        if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
+            csv_export.pop("thread_title")
+            csv_export["item"] = csv_export.pop("comment")
+            csv_export["item_url"] = csv_export.pop("thread_url")
+
         df = pandas.DataFrame(csv_export)
+
+        # Reordering cols
+        if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
+            df = df[["item", "price", "description", "item_url", "user", "profile_link", "date"] + ners]
+        else:
+            df = df[["comment", "thread_title", "thread_url", "user", "profile_link", "date"] + ners]
+
+        # Drop col if not found at all
+        for i in csv_export:
+            not_found = all(element == 'NOT FOUND' for element in csv_export[i])
+            if not_found: df = df.drop(i, axis=1)
+
         df.to_csv(r'..\crawler\exported_users\interesting_users_' + self.webpage.name + '.csv')
 
 def pretty(s):
     import re
     import demoji
 
-    s = demoji.replace_with_desc(str(s.decode("utf-8","ignore")))
+    s = demoji.replace_with_desc(str(s))
+    s = re.sub(r'[^\x00-\x7f]', r'', s)
 
     return re.sub(' +', ' ', s.replace('\n', ' ').replace('\r', '').replace('\t', '')).rstrip().lstrip()
 

@@ -57,5 +57,5 @@ class UserInfo:
         return all_comments
 
     def __str__(self):
-        return "Username: " + self.username + "\nProfile URL extention: " + self.profile_url + "\nAttributes: " + str(
+        return "Username: " + self.username + "\nProfile URL extension : " + self.profile_url + "\nAttributes: " + str(
             self.attributes) + "\nList of comments:" + str(self.comments)

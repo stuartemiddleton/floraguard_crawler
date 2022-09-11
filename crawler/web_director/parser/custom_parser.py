@@ -121,6 +121,7 @@ def create_webpage_handler():
     webpage_handler = WebpageHandler(create_custom_site(data),
                                      get_thread_model(data),
                                      get_comment_model(data),
+                                     data["comment_keyword_names"],
                                      data["filter_comments"], data["anonymous"])
     return webpage_handler
 
@@ -142,7 +143,6 @@ def read_txt(paths):
         with open("../crawler/web_director/lexicon/" + path, encoding='utf-8') as f:
             lines = f.readlines()
             if "excluded_terms" in path:
-                print("Excluding words in " + str(path))
                 for i in range(0, len(lines)):
                     if i == 0:
                         regex += r"(?!^.*\b" + lines[i].strip() + r"\b"
