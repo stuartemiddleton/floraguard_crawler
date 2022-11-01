@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="focussed_crawler" basedir="./" default="info">
+
+	<!--
+		clean and checking targets
+	-->
+	<target name="clean" depends="init.properties" unless="noclean">
+		<delete dir="${build.dir}" failonerror="false"/>
+	</target>
+
+	<!--
+		viz app
+	-->
+	<target name="test.intel_viz" depends="clean, init.properties" description="intel graph visualization code, github version">
+
+		<fail unless="config" message="config missing property e.g. -Dconfig=../../config/example.ini"/>
+		<fail unless="data-graph" message="data-graph missing property -Ddata-graph=../../corpus/example/example_data_graph.json"/>
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.dir}/bin"/>
+
+		<echo>
+		Viz [start]
+		</echo>
+		
+		<!-- copy files -->
+		<copy todir="${build.dir}/bin" failonerror="false">
+			<!-- app -->
+			<fileset dir="${src.dir}">
+				<include name="intel_viz.py"/>
+				<include name="intel_viz_lib.py"/>
+			</fileset>
+		</copy>
+		
+		<!-- run app -->
+		<exec executable="py.exe" dir="${build.dir}/bin" failonerror="true">
+			<arg value="intel_viz.py"/>
+			<arg value="${config}"/>
+			<arg value="${data-graph}"/>
+		</exec>
+
+		<echo>
+		Viz [end]
+		</echo>
+	</target>
+
+<!--    Start the web crawler-->
+    <target name="crawl">
+        <exec executable="py.exe" dir="crawler/" failonerror="true">
+			<arg value="runner.py"/>
+		</exec>
+    </target>
+
+    <!--    Testing custom configs-->
+    <target name="test.config">
+        <exec executable="py.exe" dir="crawler/scripts" failonerror="true">
+			<arg value="check_config_file.py"/>
+            <arg value="${path}"/>
+            <arg value="${thread_url}"/>
+		</exec>
+    </target>
+
+    <!--    Parsing the data for the graph-->
+    <target name="parse.crawled-data">
+        <exec executable="py.exe" dir="crawler/scripts" failonerror="true">
+			<arg value="parse_data_for_graph.py"/>
+            <arg value="${data}"/>
+		</exec>
+    </target>
+
+<!--code for first iteration of viz-->
+    	<target name="viz.trial_1" depends="clean, init.properties" description="intel graph visualization code, github version">
+
+		<fail unless="config" message="config missing property e.g. -Dconfig=../../config/example.ini"/>
+		<fail unless="data-graph" message="data-graph missing property -Ddata-graph=../../corpus/example/example_data_graph.json"/>
+
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.dir}/bin"/>
+
+		<echo>
+		Viz [start]
+		</echo>
+
+		<!-- copy files -->
+		<copy todir="${build.dir}/bin" failonerror="false">
+			<!-- app -->
+			<fileset dir="${src.dir}">
+				<include name="intel_viz.py"/>
+				<include name="intel_viz_lib.py"/>
+			</fileset>
+		</copy>
+
+		<!-- run app -->
+		<exec executable="py.exe" dir="${build.dir}/bin" failonerror="true">
+			<arg value="intel_viz.py"/>
+			<arg value="${config}"/>
+			<arg value="${data-graph}"/>
+		</exec>
+
+		<echo>
+		Viz [end]
+		</echo>
+	</target>
+
+	<!--
+		properties not dependant on local context
+		version numbers for software releases
+	-->
+	<target name="init.properties" description="Initialise properties">
+		<property name="project.name" value="focussed_crawler"/>
+		<property name="project.home" value="."/>
+		<property name="src.dir" value="./src"/>
+		<property name="build.dir" value="./build"/>
+		<property name="config.dir" value="./config"/>
+		<property name="third-party.dir" value="./third-party"/>
+		<property environment="env"/>
+	</target>
+
+	<target name="init.versions" description="Initialise version numbers for distribution targets">
+		<property name="viz.version" value="1_0"/>
+	</target>
+
+	<!--
+		help info
+	-->
+	<target name="info" depends="init.properties, init.versions" description="List all project information">
+		<echo level="info">
+		Basic pre-requisites
+		--------------------
+		Python 3.7 and various python libraries (see /docs)
+			
+		Useful information
+		-------------------
+		Project name = ${project.name}
+		Project home = ${project.home}
+
+		version = ${viz.version}
+			
+			
+		"ant info" for this message
+		"ant -projecthelp" for a list of available targets (build, dist, test and deploy)
+
+		</echo>
+	</target>
+</project>
