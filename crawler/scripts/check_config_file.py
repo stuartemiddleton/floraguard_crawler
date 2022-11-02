@@ -27,14 +27,19 @@ if __name__ == '__main__':
     print("===================Testing configuration on thread===================")
     people = []
     page = requests.get(thread_url).text
-    soup = BeautifulSoup(page, 'html.parser',from_encoding='utf-8')
+    #soup = BeautifulSoup(page, 'html.parser',from_encoding='utf-8')
+    soup = BeautifulSoup(page, 'html.parser')
     block_list = soup.find_all(**site['block_regex'])
     print("Identified " + str(len(block_list)) + " blocks")
     for block in block_list:
+        print("Identified block " + repr(block.name) + " with class " + repr(block['class']))
+
         user_name = None
         user_link = None
 
         for profile in block.find_all(**site['profile_regex']):
+            print("Identified profile " + repr(profile.name) + " with class " + repr(profile['class']))
+
             user_name = profile.find(**site['profile_name_regex'])
             user_link = profile.find(**site['profile_link_regex'])
             if user_name and user_link is not None:

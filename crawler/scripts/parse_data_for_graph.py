@@ -1,4 +1,4 @@
-import sys
+import sys,os
 import json
 import random
 import stanza
@@ -57,9 +57,9 @@ if __name__ == '__main__':
 
                 ######### CUSTOM NERS ##########
                 import os
-                path = r"../web_director/lexicon"
+                path = '..' + os.sep + 'web_director' + os.sep + 'lexicon'
                 for file in os.listdir(path):
-                    regex = read_txt(path + "/" + file)
+                    regex = read_txt(path + os.sep + file)
                     for words in re.findall(regex,comment["comment"]):
                         res = file.replace(".txt","").replace("_", " ").title().replace(" ", "")
                         ner_tags.append("NER-"+res+":"+words)
@@ -71,6 +71,6 @@ if __name__ == '__main__':
         res = file.replace(".txt","").replace("_", " ").title().replace(" ", "")
         print("CUSTOM NER: " + "NER-" + res)
 
-    with open(r'../exported_users/parsed_data.json', 'w') as fp:
+    with open('..' + os.sep + 'exported_users' + os.sep + 'parsed_data.json', 'w') as fp:
         json.dump(final_dict, fp)
 

@@ -33,7 +33,7 @@ from web_director.web_handler.WebpageHandler import WebpageHandler
 
 
 def read_config():
-    path = r"..\crawler\web_director\run_config.json"
+    path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'run_config.json'
     with open(path) as f:
         data = json.load(f)
     return data
@@ -42,9 +42,9 @@ def read_config():
 def create_custom_site(config):
     print("Searching for custom sites")
     name = config["name"]
-    path = r"..\crawler\web_director\parser\custom_webpages"
+    path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'parser' + os.sep + 'custom_webpages'
     for file in os.listdir(path):
-        with open(path + "\\" + file) as json_file:
+        with open(path + os.sep + file) as json_file:
             data = json.load(json_file)
             if data["name"] not in name:
                 continue
@@ -140,7 +140,7 @@ def text_to_regex(dict):
 def read_txt(paths):
     regex = r"(?i)"
     for path in paths:
-        with open("../crawler/web_director/lexicon/" + path, encoding='utf-8') as f:
+        with open('..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'lexicon' + os.sep + path, encoding='utf-8') as f:
             lines = f.readlines()
             if "excluded_terms" in path:
                 for i in range(0, len(lines)):

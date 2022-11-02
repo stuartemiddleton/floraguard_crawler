@@ -27,6 +27,7 @@ from web_director.user.Seller import SellerInfo
 from web_director.user.User import UserInfo
 from web_director.abc import MarketPlaceABC, WebAbstractClass
 
+NOT_FOUND = 'NOT FOUND'
 
 class WebpageHandler:
 
@@ -96,7 +97,7 @@ class WebpageHandler:
                     # Hashing name if anonymous is active
                     if self.anonymous:
                         name = str(abs(hash(name)) % (10 ** 8))
-                        user_link = "NOT FOUND"
+                        user_link = NOT_FOUND
                     break
 
             if block.find(**self.webpage.comment_regex()) is None:
@@ -112,7 +113,10 @@ class WebpageHandler:
                     self.people[name].add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
                 # New User
                 else:
-                    user_link_href = user_link['href']
+                    if user_link == NOT_FOUND :
+                        user_link_href = NOT_FOUND
+                    else :
+                        user_link_href = user_link['href']
 
                     if user_link_href.startswith('./'):
                         user_link_href = self.webpage.root_page_url + user_link_href[2:]
@@ -123,7 +127,8 @@ class WebpageHandler:
 
         for link in self.direct_crawler():
             self.crawler_stats["Profiles scraped"] += 1
-            self.process(str(requests.get(link).text.encode('utf-8')), link)
+            if link != NOT_FOUND :
+                self.process(str(requests.get(link).text.encode('utf-8')), link)
 
     """
         Extracts the attributes of the commenter 
@@ -177,7 +182,7 @@ class WebpageHandler:
 
         date = soup.find(**self.webpage.date_regex())
         if date is None or self.webpage.date_regex() == {}:
-            date = "NOT FOUND"
+            date = NOT_FOUND
         else:
             date = pretty(date.text)
 
@@ -187,7 +192,7 @@ class WebpageHandler:
         if item_name is not None:
 
             if name is None:
-                name = "NOT FOUND"
+                name = NOT_FOUND
             else:
                 name = pretty(name.get_text())
                 # Hashing name if anonymous is active
@@ -195,7 +200,7 @@ class WebpageHandler:
                     name = str(abs(hash(name)) % (10 ** 8))
 
             if seller_description is None:
-                text = "NOT FOUND"
+                text = NOT_FOUND
             else:
                 if self.webpage.root_page_url == "https://www.ebay.com/":
                     text = pretty(BeautifulSoup(requests.get(seller_description["src"]).content, "html.parser").get_text())
@@ -203,7 +208,7 @@ class WebpageHandler:
                     text = pretty(seller_description.get_text())
 
             if seller_url is None or self.webpage.seller_url_regex() == {} or self.anonymous:
-                seller_url = "NOT FOUND"
+                seller_url = NOT_FOUND
             else:
                 seller_url = seller_url['href']
 
@@ -236,7 +241,8 @@ class WebpageHandler:
                 if self.comment_model.accept(person.get_all_comments()):
                     logging.info("INTERESTING USER: " + str(username))
                     logging.info("URL: " + str(person.get_profile_url()))
-                    profile_links.append(person.get_profile_url())
+                    if person.get_profile_url() != NOT_FOUND :
+                        profile_links.append(person.get_profile_url())
                     self.interesting_people.append(username)
                     self.finish()
                     logging.info('*** Saved ***')
@@ -276,7 +282,7 @@ class WebpageHandler:
                 }, **self.people[person].attributes}
 
         import json
-        with open(r'..\crawler\exported_users\interesting_users_' + self.webpage.name + '.json', 'w') as fp:
+        with open('..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.json', 'w') as fp:
             json.dump(exported_data, fp)
 
         self.csv_export(exported_data)
@@ -292,7 +298,7 @@ class WebpageHandler:
             csv_export["description"] = []
 
         ######### CUSTOM NERS ##########
-        path = r"../crawler/web_director/lexicon"
+        path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'lexicon'
         for file in self.comment_keyword_names:
             res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
             csv_export["NER-" + res] = []
@@ -310,10 +316,10 @@ class WebpageHandler:
                     csv_export["date"].append(comment["date"])
                     csv_export["thread_title"].append(comment["thread"])
 
-                    path = r"../crawler/web_director/lexicon"
+                    path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'lexicon'
 
                     for file in self.comment_keyword_names:
-                        regex = read_txt(path + "/" + file)
+                        regex = read_txt(path + os.sep + file)
                         ner_tags = []
                         res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
                         for words in re.findall(regex, comment["comment"]):
@@ -341,10 +347,10 @@ class WebpageHandler:
 
         # Drop col if not found at all
         for i in csv_export:
-            not_found = all(element == 'NOT FOUND' for element in csv_export[i])
+            not_found = all(element == NOT_FOUND for element in csv_export[i])
             if not_found: df = df.drop(i, axis=1)
 
-        df.to_csv(r'..\crawler\exported_users\interesting_users_' + self.webpage.name + '.csv')
+        df.to_csv('..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.csv')
 
 def pretty(s):
     import re
@@ -356,7 +362,7 @@ def pretty(s):
     return re.sub(' +', ' ', s.replace('\n', ' ').replace('\r', '').replace('\t', '')).rstrip().lstrip()
 
 def url_fixer(string):
-    if string[0] is not "/":
+    if string[0] != "/":
         if str(string[0]).isalpha():
             return "/" + string
         else:

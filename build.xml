@@ -33,7 +33,7 @@
 		</copy>
 		
 		<!-- run app -->
-		<exec executable="py.exe" dir="${build.dir}/bin" failonerror="true">
+		<exec executable="py" dir="${build.dir}/bin" failonerror="true">
 			<arg value="intel_viz.py"/>
 			<arg value="${config}"/>
 			<arg value="${data-graph}"/>
@@ -44,16 +44,16 @@
 		</echo>
 	</target>
 
-<!--    Start the web crawler-->
+	<!--    Start the web crawler-->
     <target name="crawl">
-        <exec executable="py.exe" dir="crawler/" failonerror="true">
+        <exec executable="py" dir="crawler/" failonerror="true">
 			<arg value="runner.py"/>
 		</exec>
     </target>
 
     <!--    Testing custom configs-->
     <target name="test.config">
-        <exec executable="py.exe" dir="crawler/scripts" failonerror="true">
+        <exec executable="py" dir="crawler/scripts" failonerror="true">
 			<arg value="check_config_file.py"/>
             <arg value="${path}"/>
             <arg value="${thread_url}"/>
@@ -62,13 +62,13 @@
 
     <!--    Parsing the data for the graph-->
     <target name="parse.crawled-data">
-        <exec executable="py.exe" dir="crawler/scripts" failonerror="true">
+        <exec executable="py" dir="crawler/scripts" failonerror="true">
 			<arg value="parse_data_for_graph.py"/>
             <arg value="${data}"/>
 		</exec>
     </target>
 
-<!--code for first iteration of viz-->
+	<!--code for first iteration of viz-->
     	<target name="viz.trial_1" depends="clean, init.properties" description="intel graph visualization code, github version">
 
 		<fail unless="config" message="config missing property e.g. -Dconfig=../../config/example.ini"/>
@@ -91,7 +91,7 @@
 		</copy>
 
 		<!-- run app -->
-		<exec executable="py.exe" dir="${build.dir}/bin" failonerror="true">
+		<exec executable="py" dir="${build.dir}/bin" failonerror="true">
 			<arg value="intel_viz.py"/>
 			<arg value="${config}"/>
 			<arg value="${data-graph}"/>

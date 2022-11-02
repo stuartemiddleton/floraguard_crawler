@@ -14,7 +14,9 @@ Middleton, S.E. Lavorgna, L. Neumann, G. Whitehead, D. Information Extraction fr
 
 Whitehead, D. Cowell, C.R. Lavorgna, A. Middleton, S.E. Countering plant crime online: Cross-disciplinary collaboration in the FloraGuard study, Forensic Science International: Animals and Environments, Volume 1, Elsevier, 2021. https://doi.org/10.1016/j.fsiae.2021.100007
 
-# Installation for Windows 10/11
+Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
+
+# Installation
 ## Step 1. Install the prerequisites *
 - [Python 3.7.9](https://www.python.org/downloads/release/python-379/)
 - [Java SE Development Kit 18](https://www.oracle.com/java/technologies/downloads/#jdk18-windows)
@@ -31,11 +33,16 @@ cd focussed_crawler
 
 ## Step 3. Set up the environment & activate it
 ```
-# win10 powershell users only (allow scripts to run)
+
+#
+# win10
+#
+
+# powershell users only (allow scripts to run)
 Set-ExecutionPolicy -Scope CurrentUser Unrestricted
 
-# make a new env folder (to store downloaded libraries etc)
-py -m venv env
+# make a new ./env folder (to store downloaded libraries etc)
+py -m venv ./env
 
 # upgrade pip (needed for cryptography install)
 py -m pip install --upgrade pip
@@ -43,15 +50,52 @@ py -m pip install --upgrade pip
 # activate env
 .\env\Scripts\activate
 
+# Prebuilt windows binaries from gohlke do not have an archive of the older versions the crawler needs (so need to compile scipi)
+# https://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy
+
+# install Microsoft Visual C++ Redistributable so python libs can be compiled for win64
+# this should come with lapack pre-compiled DLLs so scipy can install OK
+# note: lapack compilation is not trivial (it requires a C, C++ and Fortran compiler - such as VisualStudio and Visual F#)
+# https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170
+
+# VisualStudio paths for checking its installed correctly
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin
+# C:\Windows\Microsoft.NET\Framework\v4.0.30319
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\
+
+# Install and compile lapack which is needed for scipy installation (lapack is not shipped with recent VisualStudio versions)
+# https://icl.utk.edu/lapack-for-windows/lapack/index.html#lapacke
+# https://cmake.org/download/
+# note: not tested
+
 # install all prerequisites to env
 py -m pip install -r requirements.txt
+
+#
+# Ubuntu
+#
+
+sudo apt install python3.8-venv
+py -m venv ./env
+py -m pip install --upgrade pip
+py -m pip install wheel
+sudo apt-get install libfreetype-dev
+chmod +x ./env/bin/activate
+source ./env/bin/activate
+py -m pip install -r requirements.txt
+
+# use 'deactivate' to leave virtual environment
+
+
 ```
 
 ## Step 4. Testing the crawler is set up correctly
 
-The configuration of the crawler is located in ```../web_directory``` ensure that the name is 'mocked'. If you want to add any further websites they should be placed in ```../web_directory/parser/custom_webpages```
+Crawler scripts are in ./crawler/scripts
+Crawler configuration files are in ./crawler/web_director
 
-Next we check website configuration is correct
+Next we check website configuration is correct using the mock unicorn website. The script is run from ./crawler/scripts so the path parameter needs to go back two directories using the ../.. to find the crawler dir.
 
 ```
 ant test.config -Dpath=../../crawler/web_director/parser/custom_webpages/mock_site.json -Dthread_url=https://sohaibkarous.wixsite.com/mock-unicorn/forum/general-discussions/unicorns-and-unee-products-for-sale 
@@ -159,6 +203,10 @@ Marketplaces are configured according to the following HTML blocks:
 Once you set up the config for the website you want to crawl and updated the run_config and checked you are withing the environment we created earlier, 
 running the crawler is as simple as running ``` ant crawl ``` in your terminal.
 
+```
+ant crawl
+```
+
 # Reviewing the captured data
 Once the crawl has finished, two files will be saved to ```focussed_crawler\crawler\exported_users``` (if anything of relevance to the keywords has been identified). These files are termed “interesting users_XXXX”, with the XXXX replaced with whatever name you gave the website in the configuration file.
 One is an excel document (.csv) containing all the important information that was crawled from the website. The other is a .json file containing the crawled HTML data. 
@@ -168,6 +216,22 @@ The excel document displays key data from each online post captured by the crawl
 The .json file has columns representing which keyword from the lexicon it found in the comment to trigger the export. For instance, in the example below, the key words `Conophytum’ (from the `Plants’ lexicon) and `buy’ (from the `Trade Words’ lexicon).
 
 Both the .csv and .json files can be combined with other analysis tools for further exploration.
+
+```
+#
+# win10
+#
+
+dir crawler\exported_users
+type crawler\exported_users\interesting_users_mocked.json
+
+#
+# ubuntu
+#
+
+ls -la crawler/exported_users
+cat crawler/exported_users/interesting_users_mocked.json
+```
 
 # Visualisation
 Once the crawl is completed we parse data and then visualise
