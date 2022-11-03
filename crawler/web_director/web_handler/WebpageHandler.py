@@ -22,7 +22,7 @@ import requests
 import logging
 import dateutil.parser as dparser
 from bs4 import BeautifulSoup
-from datetime import datetime
+import datetime
 from web_director.user.Seller import SellerInfo
 from web_director.user.User import UserInfo
 from web_director.abc import MarketPlaceABC, WebAbstractClass
@@ -43,6 +43,12 @@ class WebpageHandler:
         self.interesting_people = []
         self.anonymous = anonymous
         self.filter_comments = filter_comments
+        logging.info( 'TEST = ' + repr(self.webpage.timeout_hours) )
+        if self.webpage.timeout_hours != None :
+            self.timeout_hours = datetime.datetime.utcnow() + datetime.timedelta( hours=self.webpage.timeout_hours )
+        else :
+            self.timeout_hours = None
+        logging.info('*** crawl webpage handler init - timeout ' + str(self.timeout_hours) + ' ***')
 
 
     """ -----------------------------------------------------------------------------------
@@ -255,7 +261,7 @@ class WebpageHandler:
 
     def finish(self):
 
-        import datetime
+        #import datetime
         exported_data = {}
         for person in self.interesting_people:
             comments = self.people[person].comments

@@ -20,6 +20,7 @@ from web_director.impl.reference.ContainsKeywordModel import ContainsKeywordMode
 from web_director.impl.reference.PositiveSentimentModel import CommentsPositiveSentiment
 import os
 import json
+import logging
 
 # //                          "2": ["buy",
 # //                            "sell",
@@ -62,7 +63,10 @@ def create_custom_site(config):
                 webpage._profile_link_regex = data["profile_link_regex"]
                 webpage._date_regex = data["date_regex"]
                 webpage._attributes_regex = data["attributes_regex"]
-                print("Created web_director, returning result")
+                if "timeout_hours" in config :
+                    webpage.timeout_hours = config["timeout_hours"]
+                else :
+                    webpage.timeout_hours = None
                 return webpage
             if config["type"] == "marketplace":
                 webpage = CustomMarketPlace(data["name"])
@@ -77,7 +81,10 @@ def create_custom_site(config):
                 webpage._price_regex = data["price_regex"]
                 webpage._seller_block_regex = data["seller_block_regex"]
                 webpage._attributes_regex = data["attributes_regex"]
-                print("Created web_director, returning result")
+                if "timeout_hours" in config :
+                    webpage.timeout_hours = config["timeout_hours"]
+                else :
+                    webpage.timeout_hours = None
                 return webpage
 
     raise Exception("Cannot find custom site")
@@ -116,7 +123,7 @@ def get_thread_model(data):
         raise Exception("Model not defined")
 
 
-def create_webpage_handler():
+def create_webpage_handler( timeout_hours = None ):
     data = read_config()
     webpage_handler = WebpageHandler(create_custom_site(data),
                                      get_thread_model(data),

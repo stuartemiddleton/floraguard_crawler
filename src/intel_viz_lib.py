@@ -150,8 +150,8 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 	aggregate_nodes = True
 
 	# change current (default) figure size to be the screen size for a large display
-	screen_y = plt.get_current_fig_manager().window.winfo_screenheight()
-	screen_x = plt.get_current_fig_manager().window.winfo_screenwidth()
+	screen_y = 1080
+	screen_x = 1920
 	dict_config['logger'].info( 'screen size = ' + repr( (screen_x, screen_y) ) )
 	plt.gcf().set_size_inches( 0.8*screen_x/96, 0.8*screen_y/96 )
 	plt.gcf().set_dpi( 96 )
@@ -182,26 +182,26 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 
 	for strEntity in G.nodes() :
 		if strEntity in list_root_nodes :
-			G.node[strEntity]['category'] = 'root'
+			G.nodes[strEntity]['category'] = 'root'
 		else :
 			bFound = False
 			for strCategory in dict_config['entity_prefix_map'] :
 				for strPrefix in dict_config['entity_prefix_map'][strCategory] :
 					if strEntity.startswith( strPrefix ) :
-						G.node[strEntity]['category'] = strCategory
+						G.nodes[strEntity]['category'] = strCategory
 						bFound = True
 						break
 				if bFound == True :
 					break
 			if bFound == False :
-				G.node[strEntity]['category'] = 'unknown'
+				G.nodes[strEntity]['category'] = 'unknown'
 
 	# remove any node categories in the filter list
 	listEntities = []
 	for strEntity in G.nodes() :
 		listEntities.append( strEntity )
 	for strEntity in listEntities :
-		if G.node[strEntity]['category'] in dict_config['category_filter'] :
+		if G.nodes[strEntity]['category'] in dict_config['category_filter'] :
 			G.remove_node( strEntity )
 
 	# order nodes by connection density
@@ -214,6 +214,23 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 			nConnections = nConnections + dictEdges[strNodeConnected]['weight']
 		listOrderedNodes.append( ( strEntity,nConnections ) )
 	listOrderedNodes = sorted( listOrderedNodes, key=lambda entry: entry[1], reverse=True )
+
+	# remove all but top N nodes to avoid overloading the graph (which will be very slow to render)
+	nRemovedCount = 0
+	if G.number_of_nodes() > max_nodes :
+		# remove nodes outside topN (and not a root node)
+
+		nIndex1 = max_nodes
+		while nIndex1 < len(listOrderedNodes) :
+			( strEntityOrderedList, nConnectionsOrderedList ) = listOrderedNodes[ nIndex1 ]
+			if not strEntityOrderedList in list_root_nodes :
+				G.remove_node( strEntityOrderedList )
+				del listOrderedNodes[ nIndex1 ]
+				nRemovedCount += 1
+			else :
+				nIndex1 += 1
+
+		dict_config['logger'].info( 'max nodes exceeded # ' + str(nRemovedCount) + ' nodes removed' )
 
 	# make names and sizes for all nodes
 	listNodeSizes = []
@@ -236,16 +253,18 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 			nSize = 1600
 		listNodeSizes.append( nSize )
 
-		# node name (remove prefix, strip post suffix)
-		listParts = strEntity.split(':')
-		strName = listParts[-1]
-		if '@@@' in strName :
-			strName = strName.split('@@@')[0]
+		# pretty print entities
+		if '@@@' in strEntity :
+			strName = strEntity.split('@@@')[0]
+		elif ':' in strEntity :
+			strName = strEntity.split(':')[1]
+		else :
+			strName = strEntity
 		
 		# pseudonymization (use hash of name prefixed by type)
 		if (len(listPseudonymization) > 0) and (len(strName) > 0) :
 
-			strCat = G.node[strEntity]['category']
+			strCat = G.nodes[strEntity]['category']
 			if strCat in listPseudonymization :
 				strHashedName = hashlib.shake_256( strName.encode("utf-8") ).hexdigest( 2 )
 
@@ -258,6 +277,11 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 				else :
 					strName = strCat + '_' + strHashedName
 
+		# truncate long names (too log to fit like page URL's - 30 character limit)
+		nTrunc = int( dict_config['max_node_text_length'] )
+		if nTrunc != 0 :
+			strName = strName[:nTrunc]
+
 		# add name to dict
 		dictNodeNames[strEntity] = strName
 
@@ -265,24 +289,6 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 		if 'preserve_node_prefix' in dict_config :
 			if ast.literal_eval( dict_config['preserve_node_prefix'] ) == True :
 				dictNodeNames[strEntity] = strEntity
-
-	# remove all but top N nodes to avoid overloading the graph (which will be very slow to render)
-	nRemovedCount = 0
-	if G.number_of_nodes() > max_nodes :
-		# remove nodes outside topN (and not a root node)
-
-		nIndex1 = max_nodes
-		while nIndex1 < len(listOrderedNodes) :
-			( strEntityOrderedList, nConnectionsOrderedList ) = listOrderedNodes[ nIndex1 ]
-			if not strEntityOrderedList in list_root_nodes :
-				G.remove_node( strEntityOrderedList )
-				del listOrderedNodes[ nIndex1 ]
-				del dictNodeNames[ strEntityOrderedList ]
-				nRemovedCount += 1
-			else :
-				nIndex1 += 1
-
-		dict_config['logger'].info( 'max nodes exceeded # ' + str(nRemovedCount) + ' nodes removed' )
 
 	# layout by edge weight
 	dictEdgeLabels = nx.get_edge_attributes( G, 'weight' )
@@ -312,7 +318,7 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 	listEdgeColours = []
 	listEdgeLineWidths = []
 	for ( strNode1,strNode2,dictAttr ) in G.edges(data=True) :
-		strCat = G.node[ strNode1 ]['category']
+		strCat = G.nodes[ strNode1 ]['category']
 		listEdgeColours.append( colour_map[ strCat ] )
 		nWidth = dictAttr['weight']
 		if nWidth > 5 :
@@ -339,6 +345,9 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 		font_color='grey' )
 
 	limits = plt.axis('off')  # turn off axis
+
+	dict_config['logger'].info( 'figure saved to viz.png' )
+	plt.savefig('viz.png', bbox_inches='tight')
 
 	plt.show()
 

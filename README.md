@@ -237,8 +237,23 @@ cat crawler/exported_users/interesting_users_mocked.json
 Once the crawl is completed we parse data and then visualise
 
 ```
+# parse and visualize mocked forum
 ant parse.crawled-data -Ddata=../../crawler/exported_users/interesting_users_mocked.json
-ant viz.trial_1 -Dconfig=../../config/trial_1.ini -Ddata-graph=../../crawler/exported_users/parsed_data.json
+cp crawler/exported_users/parsed_data.json crawler/exported_users/parsed_data_mocked.json
+ls -la crawler/exported_users/parsed_data_mocked.json
+
+ant viz -Dconfig=../../config/viz_config.ini -Ddata-graph=../../crawler/exported_users/parsed_data_mocked.json
+cp build/bin/viz.png build/bin/viz_mocked.png
+ls -la build/bin/viz_mocked.png
+
+# parse and visualize ebay marketplace
+ant parse.crawled-data -Ddata=../../crawler/exported_users/interesting_users_ebay.json
+cp crawler/exported_users/parsed_data.json crawler/exported_users/parsed_data_ebay.json
+ls -la crawler/exported_users/parsed_data_ebay.json
+
+ant viz -Dconfig=../../config/viz_config.ini -Ddata-graph=../../crawler/exported_users/parsed_data_ebay.json
+cp build/bin/viz.png build/bin/viz_ebay.png
+ls -la build/bin/viz_ebay.png
 ```
 
 ## Configuration of visualization
@@ -347,9 +362,3 @@ NER-ORGANIZATION etc.
 
 ```
 
-## Execution
-
-```
-cd /projects-git-soton/ogie/focussed_crawler
-ant test.intel_viz -Dconfig=../../config/example.ini -Ddata-graph=../../corpus/example/example_data_graph.json
-```

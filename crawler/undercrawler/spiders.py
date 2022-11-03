@@ -7,6 +7,8 @@ import re
 from typing import Optional
 from urllib.parse import urljoin, urlsplit
 import uuid
+import datetime
+import logging
 
 import autopager
 import formasaurus
@@ -117,6 +119,12 @@ class BaseSpider(scrapy.Spider):
     def parse(self, response):
         if not self.link_extractor.matches(response.url):
             return
+
+        # check page handler timeout (if any)
+        if self.webpage_handler.timeout_hours != None :
+            if datetime.datetime.utcnow() >= self.webpage_handler.timeout_hours :
+                logging.info('*** crawl timeout (aborting new URLs) ***')
+                raise scrapy.exceptions.CloseSpider('crawling overall timeout')
 
         # Page handler
         cont = self.webpage_handler.process(response.body, response.url)

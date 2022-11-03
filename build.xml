@@ -69,7 +69,7 @@
     </target>
 
 	<!--code for first iteration of viz-->
-    	<target name="viz.trial_1" depends="clean, init.properties" description="intel graph visualization code, github version">
+    	<target name="viz" depends="clean, init.properties" description="intel graph visualization code, github version">
 
 		<fail unless="config" message="config missing property e.g. -Dconfig=../../config/example.ini"/>
 		<fail unless="data-graph" message="data-graph missing property -Ddata-graph=../../corpus/example/example_data_graph.json"/>
