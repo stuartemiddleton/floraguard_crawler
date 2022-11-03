@@ -257,7 +257,7 @@ def viz_data_graph( list_root_nodes = [], entity_index = {}, dict_config = None 
 		if '@@@' in strEntity :
 			strName = strEntity.split('@@@')[0]
 		elif ':' in strEntity :
-			strName = strEntity.split(':')[1]
+			strName = ':'.join(strEntity.split(':')[1:])
 		else :
 			strName = strEntity
 		
