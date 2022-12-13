@@ -27,6 +27,12 @@ _*Make sure you have added Apache Ant, Java & Python to your PATH._
 
 ## Step 2. Clone the repository & CD into it
 ```
+#
+# win10 - create folder <base-dir> using File Explorer, then open PowerShell (as administrator if your user account does not have permissions to install code)
+# Ubuntu - open teminal window (or SSH in), then mkdir <base-dir>
+#
+
+cd <base-dir>
 git clone https://github.com/stuartemiddleton/floraguard_crawler.git
 cd focussed_crawler
 ```
