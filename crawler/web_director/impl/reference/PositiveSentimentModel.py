@@ -3,6 +3,7 @@ from web_director.abc import ModelAbstractClass
 import re
 import stanza
 
+
 class CommentsPositiveSentiment(ModelAbstractClass.ModelABC):
 
     def __init__(self, comment_length):

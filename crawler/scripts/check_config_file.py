@@ -30,7 +30,7 @@ if __name__ == '__main__':
     #soup = BeautifulSoup(page, 'html.parser',from_encoding='utf-8')
     soup = BeautifulSoup(page, 'html.parser')
     block_list = soup.find_all(**site['block_regex'])
-    print("Identified " + str(len(block_list)) + " blocks")
+    print("Identified " + str(len(block_list)) + " blocks ")
     for block in block_list:
         print("Identified block " + repr(block.name) + " with class " + repr(block['class']))
 
