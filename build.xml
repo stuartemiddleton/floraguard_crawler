@@ -51,10 +51,6 @@
 
 	<!--    Start the web crawler-->
     <target name="crawl">
-		<exec executable="python" dir="." failonerror="true">
-			<arg value='-c'/>
-			<arg value='"import autopager; print(autopager.__version__)"'/>
-		</exec>
         <exec executable="python" dir="crawler/" failonerror="true">
 			<arg value="runner.py"/>
 		</exec>
@@ -122,7 +118,7 @@
 		<property name="build.dir" value="./build"/>
 		<property name="config.dir" value="./config"/>
 		<property name="third-party.dir" value="./third-party"/>
-		<property environment="myenv"/>
+		<property environment="env"/>
 	</target>
 
 	<target name="init.versions" description="Initialise version numbers for distribution targets">
