@@ -6,6 +6,11 @@
 	-->
 	<target name="clean" depends="init.properties" unless="noclean">
 		<delete dir="${build.dir}" failonerror="false"/>
+
+
+		<exec executable="python" dir="." failonerror="true">
+			<arg value="--version"/>
+		</exec>
 	</target>
 
 	<!--
@@ -33,7 +38,7 @@
 		</copy>
 		
 		<!-- run app -->
-		<exec executable="py" dir="${build.dir}/bin" failonerror="true">
+		<exec executable="python" dir="${build.dir}/bin" failonerror="true">
 			<arg value="intel_viz.py"/>
 			<arg value="${config}"/>
 			<arg value="${data-graph}"/>
@@ -46,14 +51,14 @@
 
 	<!--    Start the web crawler-->
     <target name="crawl">
-        <exec executable="py" dir="crawler/" failonerror="true">
+        <exec executable="python" dir="crawler/" failonerror="true">
 			<arg value="runner.py"/>
 		</exec>
     </target>
 
     <!--    Testing custom configs-->
     <target name="test.config">
-        <exec executable="py" dir="crawler/scripts" failonerror="true">
+        <exec executable="python" dir="crawler/scripts" failonerror="true">
 			<arg value="check_config_file.py"/>
             <arg value="${path}"/>
             <arg value="${thread_url}"/>
@@ -62,7 +67,7 @@
 
     <!--    Parsing the data for the graph-->
     <target name="parse.crawled-data">
-        <exec executable="py" dir="crawler/scripts" failonerror="true">
+        <exec executable="python" dir="crawler/scripts" failonerror="true">
 			<arg value="parse_data_for_graph.py"/>
             <arg value="${data}"/>
 		</exec>
@@ -91,7 +96,7 @@
 		</copy>
 
 		<!-- run app -->
-		<exec executable="py" dir="${build.dir}/bin" failonerror="true">
+		<exec executable="python" dir="${build.dir}/bin" failonerror="true">
 			<arg value="intel_viz.py"/>
 			<arg value="${config}"/>
 			<arg value="${data-graph}"/>
@@ -133,6 +138,7 @@
 		-------------------
 		Project name = ${project.name}
 		Project home = ${project.home}
+		Env Dir = ${env.Path}
 
 		version = ${viz.version}
 			

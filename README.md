@@ -18,13 +18,13 @@ Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
 
 # Installation
 ## Step 1. Install the prerequisites *
-- [Python 3.7.9](https://www.python.org/downloads/release/python-379/)
 - [Java SE Development Kit 18](https://www.oracle.com/java/technologies/downloads/#jdk18-windows)
 - [Apache Ant 1.10.12](https://ant.apache.org/bindownload.cgi)
 - [Git](https://github.com/git-guides/install-git)
+- [Anaconda](https://www.anaconda.com/download)
 
 _*Make sure you have added Apache Ant, Java & Python to your PATH._
-
+_*Step by Step instructions
 ## Step 2. Clone the repository & CD into it
 ```
 #
@@ -44,39 +44,12 @@ cd focussed_crawler
 # win10
 #
 
-# powershell users only (allow scripts to run)
-Set-ExecutionPolicy -Scope CurrentUser Unrestricted
+#Anaconda Powershell
+conda env create -f environment.yml 
+conda activate floraguard
 
-# make a new ./env folder (to store downloaded libraries etc)
-py -m venv ./env
-
-# upgrade pip (needed for cryptography install)
-py -m pip install --upgrade pip
-
-# activate env
-.\env\Scripts\activate
-
-# Prebuilt windows binaries from gohlke do not have an archive of the older versions the crawler needs (so need to compile scipi)
-# https://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy
-
-# install Microsoft Visual C++ Redistributable so python libs can be compiled for win64
-# this should come with lapack pre-compiled DLLs so scipy can install OK
-# note: lapack compilation is not trivial (it requires a C, C++ and Fortran compiler - such as VisualStudio and Visual F#)
-# https://learn.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170
-
-# VisualStudio paths for checking its installed correctly
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin
-# C:\Windows\Microsoft.NET\Framework\v4.0.30319
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\
-
-# Install and compile lapack which is needed for scipy installation (lapack is not shipped with recent VisualStudio versions)
-# https://icl.utk.edu/lapack-for-windows/lapack/index.html#lapacke
-# https://cmake.org/download/
-# note: not tested
-
-# install all prerequisites to env
-py -m pip install -r requirements.txt
+# environment.yml found in cloned repository
+# use 'deactivate' to leave conda environment
 
 #
 # Ubuntu
