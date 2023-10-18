@@ -26,6 +26,8 @@ import datetime
 from web_director.user.Seller import SellerInfo
 from web_director.user.User import UserInfo
 from web_director.abc import MarketPlaceABC, WebAbstractClass
+#import pandas
+import codecs, json
 
 NOT_FOUND = 'NOT FOUND'
 
@@ -43,7 +45,6 @@ class WebpageHandler:
         self.interesting_people = []
         self.anonymous = anonymous
         self.filter_comments = filter_comments
-        logging.info( 'TEST = ' + repr(self.webpage.timeout_hours) )
         if self.webpage.timeout_hours != None :
             self.timeout_hours = datetime.datetime.utcnow() + datetime.timedelta( hours=self.webpage.timeout_hours )
         else :
@@ -97,26 +98,46 @@ class WebpageHandler:
                 user_name = profile.find(**self.webpage.profile_name_regex())
                 user_link = profile.find(**self.webpage.profile_link_regex())
 
-                if user_name and user_link is not None:
+                #logging.info( 'BLOCK USER_NAME == ' + repr(user_name) )
+                #logging.info( 'BLOCK USER_NAME text == ' + repr(user_name.text) )
+                #logging.info( 'BLOCK USER_LINK == ' + repr(user_link) )
+
+                if user_name is not None:
                     name = pretty(user_name.text)
 
-                    # Hashing name if anonymous is active
-                    if self.anonymous:
-                        name = str(abs(hash(name)) % (10 ** 8))
-                        user_link = NOT_FOUND
+                if user_link is not None:
+                    # stop if we get a username and a link, otherwise keep looking in block in case there is another better entry
                     break
 
+            if user_link == None :
+                user_link = NOT_FOUND
+
+            # Hashing name if anonymous is active
+            if self.anonymous == True :
+                name = str(abs(hash(name)) % (10 ** 8))
+                user_link = NOT_FOUND
+
             if block.find(**self.webpage.comment_regex()) is None:
+                #logging.info( 'NUM COMMENTS = 0' )
                 continue
 
             comment = pretty(block.find(**self.webpage.comment_regex()).get_text())
             date = dparser.parse(block.find(**self.webpage.date_regex()).text,fuzzy=True).strftime("%d %b, %Y")
 
+            #if 'test post for Red unicorn' in comment :
+            #    logging.info( 'COMMENT == ' + repr(comment) )
+            #    logging.info( 'NAME == ' + repr(name) )
+            #    logging.info( 'USER_LINK == ' + repr(user_link) )
+
             # Creating a new Person & their comment (if person already exists then just adding the comment)
+            # note: if name is not found (e.g. profile regex not setup) then the whole comment will be ignored
             if name is not None and user_link is not None:
                 # Existing User
                 if name in self.people and comment not in self.people[name].get_all_comments():
                     self.people[name].add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
+                    #if 'test post for Red unicorn' in comment :
+                    #    logging.info( 'NEW PERSON == ' + repr(self.people[name]) )
+
                 # New User
                 else:
                     if user_link == NOT_FOUND :
@@ -130,11 +151,16 @@ class WebpageHandler:
                     person = UserInfo(name, user_link_href)
                     person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
                     self.people[name] = person
+                    #if 'test post for Red unicorn' in comment :
+                    #    logging.info( 'EXISTING PERSON == ' + repr(self.people[name]) )
 
         for link in self.direct_crawler():
             self.crawler_stats["Profiles scraped"] += 1
             if link != NOT_FOUND :
                 self.process(str(requests.get(link).text.encode('utf-8')), link)
+
+        self.finish()
+        logging.info('*** Saved ***')
 
     """
         Extracts the attributes of the commenter 
@@ -234,8 +260,11 @@ class WebpageHandler:
 
         self.direct_crawler()
 
+        self.finish()
+        logging.info('*** Saved ***')
+
     """
-        Function identifying the interesting people
+        Function identifying the interesting people (profile page links)
     """
 
     def direct_crawler(self):
@@ -247,16 +276,16 @@ class WebpageHandler:
                 if self.comment_model.accept(person.get_all_comments()):
                     logging.info("INTERESTING USER: " + str(username))
                     logging.info("URL: " + str(person.get_profile_url()))
+                    logging.info("COMMENTS: " + repr(person.get_all_comments()))
                     if person.get_profile_url() != NOT_FOUND :
                         profile_links.append(person.get_profile_url())
                     self.interesting_people.append(username)
-                    self.finish()
-                    logging.info('*** Saved ***')
 
         return profile_links
 
     """
         Finished crawling
+        dump results so far, overwriting existing results, so if crawl is long and fails we still have something serialized
     """
 
     def finish(self):
@@ -287,15 +316,24 @@ class WebpageHandler:
                     "profile_url": self.people[person].get_profile_url()
                 }, **self.people[person].attributes}
 
+        #
+        # codec file handle for serializing json (old code prob ok but this is consistent with csv code now)
+        #        
+        str_filename = '..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.json'
+        write_handle = codecs.open( str_filename, 'w', 'utf-8', errors = 'replace' )
+        write_handle.write( json.dumps(exported_data) + '\n' )
+        write_handle.close()
+
+        '''
         import json
         with open('..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.json', 'w') as fp:
             json.dump(exported_data, fp)
+        '''
 
         self.csv_export(exported_data)
 
 
     def csv_export(self, exported_data):
-        import pandas
         csv_export = {"user": [], "comment": [], "thread_url": [], "profile_link": [], "thread_title": [], "date": []}
         ners = []
 
@@ -343,6 +381,54 @@ class WebpageHandler:
             csv_export["item"] = csv_export.pop("comment")
             csv_export["item_url"] = csv_export.pop("thread_url")
 
+        #
+        # CSV serialization tab delimited code using codecs (to ensure upper range UTF-8 characters like emojis are serialized correctly)
+        #
+        str_filename = '..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.csv'
+        str_filename_encoded = '..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.encoded.csv'
+        write_handle = codecs.open( str_filename, 'w', 'utf-8', errors = 'replace' )
+        write_handle_encoded = codecs.open( str_filename_encoded, 'w', 'utf-8', errors = 'replace' )
+
+        list_keys = list( csv_export.keys() )
+
+        # header row
+        write_handle.write( '#' )
+        write_handle_encoded.write( '#' )
+        for key in list_keys :
+            write_handle.write( key )
+            write_handle_encoded.write( key )
+            if key != list_keys[-1] :
+                write_handle.write( '\t' )
+                write_handle_encoded.write( '\t' )
+        write_handle.write( '\n' )
+        write_handle_encoded.write( '\n' )
+
+        # data rows (one per post/comment)
+        for i in range(len(csv_export[list_keys[0]])) :
+            for key in list_keys :
+                element = csv_export[key][i]
+                if element != NOT_FOUND :
+                    # use json encoded strings to escape (a) newlines and tabs and (b) upper range UTF-8 entries
+                    # dont bother with the "" as these are all strings
+                    str_entry = json.dumps( element )
+                    write_handle_encoded.write( str_entry[1:-1] )
+
+                    # unencoded dump (potentially unsafe)
+                    if isinstance( element, str ) :
+                        write_handle.write( element.replace('\t',' ').replace('\n',' ') )
+                    else :
+                        write_handle.write( str_entry[1:-1] )
+
+                if key != list_keys[-1] :
+                    write_handle.write( '\t' )
+                    write_handle_encoded.write( '\t' )
+            write_handle.write( '\n' )
+            write_handle_encoded.write( '\n' )
+        write_handle.close()
+        write_handle_encoded.close()
+        
+        '''
+        # OLD PANDAS CSV serialization code
         df = pandas.DataFrame(csv_export)
 
         # Reordering cols
@@ -357,8 +443,12 @@ class WebpageHandler:
             if not_found: df = df.drop(i, axis=1)
 
         df.to_csv('..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.csv')
+        '''
 
 def pretty(s):
+    return s
+'''
+    # removed all pretty printing and emoji removal as its not needed or wanted
     import re
     import demoji
 
@@ -366,6 +456,7 @@ def pretty(s):
     s = re.sub(r'[^\x00-\x7f]', r'', s)
 
     return re.sub(' +', ' ', s.replace('\n', ' ').replace('\r', '').replace('\t', '')).rstrip().lstrip()
+'''
 
 def url_fixer(string):
     if string[0] != "/":

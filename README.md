@@ -23,6 +23,16 @@ Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
 - [Git](https://github.com/git-guides/install-git)
 - [Anaconda](https://www.anaconda.com/download)
 
+## install java and git to default locations (they will setup environment variables automatically)
+## install ant to a known location e.g. c:\ant
+## install anaconda to a known location e.g. c:\conda
+## win10 powershell environment setup (avoiding need for admin rights)
+##    [Environment]::SetEnvironmentVariable("PATH", "c:\ant\apache-ant-1.10.12\bin", "User")
+##    [Environment]::SetEnvironmentVariable("PATH", "c:\conda\condabin", "User")
+##    re-start powershell for conda command to now be on the path
+## win10 powershell environment display path
+##    Get-ChildItem Env:
+
 _*Make sure you have added Apache Ant, Java & Python to your PATH._
 _*Step by Step instructions
 ## Step 2. Clone the repository & CD into it
@@ -45,7 +55,12 @@ cd focussed_crawler
 #
 
 #Anaconda Powershell
-conda env create -f environment.yml 
+mkdir /conda/pkgs
+conda config --prepend pkgs_dirs /conda/pkgs
+conda config --prepend envs_dirs /conda/envs
+conda config --show
+conda init powershell
+conda env create --name floraguard --file environment.yml
 conda activate floraguard
 
 # environment.yml found in cloned repository
@@ -53,8 +68,19 @@ conda activate floraguard
 
 #
 # Ubuntu
+# technote: for Ubuntu 18 scikit learn 0.24.1 or higher is needed to avoid UTF-8 decode error
+#           https://stackoverflow.com/questions/65682019/attributeerror-str-object-has-no-attribute-decode-in-fitting-logistic-regre
+#           twisted-iocpsupport==1.0.4 fails to compile under Ubuntu but can be removed
+#           environment_ubuntu.yml has these changes in
 #
 
+sudo apt install dos2unix
+dos2unix environment_ubuntu.yml
+conda env create --name floraguard --file environment_ubuntu.yml
+conda activate floraguard
+
+
+# OLD
 sudo apt install python3.8-venv
 py -m venv ./env
 py -m pip install --upgrade pip
