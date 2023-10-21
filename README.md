@@ -23,18 +23,27 @@ Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
 - [Git](https://github.com/git-guides/install-git)
 - [Anaconda](https://www.anaconda.com/download)
 
-## install java and git to default locations (they will setup environment variables automatically)
-## install ant to a known location e.g. c:\ant
-## install anaconda to a known location e.g. c:\conda
-## win10 powershell environment setup (avoiding need for admin rights)
-##    [Environment]::SetEnvironmentVariable("PATH", "c:\ant\apache-ant-1.10.12\bin", "User")
-##    [Environment]::SetEnvironmentVariable("PATH", "c:\conda\condabin", "User")
-##    re-start powershell for conda command to now be on the path
-## win10 powershell environment display path
-##    Get-ChildItem Env:
+### Quick Installation for prerequisites
+
+1) Install java and git to default locations (they will setup environment variables automatically)
+2) Install ant to a known location e.g. c:\ant
+3) Install anaconda to a known location e.g. c:\conda
+4) WIN10 powershell - set environment variables for Apache ant and Anaconda using following commands (avoiding need for admin rights)
+```
+[Environment]::SetEnvironmentVariable("PATH", "{c:\ant}\apache-ant-1.10.12\bin", "User")
+[Environment]::SetEnvironmentVariable("PATH", "{c:\conda}\condabin", "User")
+```
+* where value enclosed in {} is path to respective installation locations for Apache ant and Anaconda
+5) Re-start the powershell for conda command to now be on the path
+6) To display paths in windows powershell, run following command:
+```
+Get-ChildItem Env:
+```
+
+#### FOR MORE INSTALLATION INFORMATION: Look inside guides folder
 
 _*Make sure you have added Apache Ant, Java & Python to your PATH._
-_*Step by Step instructions
+_*Step by Step instructions_
 ## Step 2. Clone the repository & CD into it
 ```
 #
