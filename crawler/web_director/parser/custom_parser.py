@@ -125,11 +125,20 @@ def get_thread_model(data):
 
 def create_webpage_handler( timeout_hours = None ):
     data = read_config()
+
+    #Option attributes
+    save_file_location = data["save_location"] if "save_location" in data else None
+    save_file_name = data["save_file_name"] if "save_file_name" in data else None
+    user_comment_limit = data["user_comment_limit"] if "user_comment_limit" in data else None
+
     webpage_handler = WebpageHandler(create_custom_site(data),
                                      get_thread_model(data),
                                      get_comment_model(data),
                                      data["comment_keyword_names"],
-                                     data["filter_comments"], data["anonymous"])
+                                     data["filter_comments"], data["anonymous"], 
+                                     save_location=save_file_location, 
+                                     save_file_name=save_file_name, 
+                                     user_comment_limit=user_comment_limit)
     return webpage_handler
 
 

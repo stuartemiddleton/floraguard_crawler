@@ -31,9 +31,14 @@ import codecs, json
 
 NOT_FOUND = 'NOT FOUND'
 
+#Default values
+DEFAULT_SAVE_LOCATION = '..' + os.sep + 'crawler' + os.sep + 'exported_users'
+DEFAULT_SAVE_FILE = "interesting_users"
+DEFAULT_USER_COMMENT_LIMIT = 100
+
 class WebpageHandler:
 
-    def __init__(self, webpage, thread_model, comment_model, comment_keyword_names, filter_comments, anonymous):
+    def __init__(self, webpage, thread_model, comment_model, comment_keyword_names, filter_comments, anonymous, **kargs):
         if anonymous: logging.info("Anonymous crawling activated")
 
         self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0}
@@ -45,6 +50,9 @@ class WebpageHandler:
         self.interesting_people = []
         self.anonymous = anonymous
         self.filter_comments = filter_comments
+        self.save_location = kargs["save_location"] if kargs["save_location"] != None else DEFAULT_SAVE_LOCATION
+        self.save_file_name = kargs["save_file_name"] if kargs["save_location"] != None else DEFAULT_SAVE_FILE
+        self.user_comment_limit = kargs["user_comment_limit"] if kargs["user_comment_limit"] != None else DEFAULT_USER_COMMENT_LIMIT
         if self.webpage.timeout_hours != None :
             self.timeout_hours = datetime.datetime.utcnow() + datetime.timedelta( hours=self.webpage.timeout_hours )
         else :
@@ -154,7 +162,7 @@ class WebpageHandler:
                     if user_link_href.startswith('./'):
                         user_link_href = self.webpage.root_page_url + user_link_href[2:]
 
-                    person = UserInfo(name, user_link_href)
+                    person = UserInfo(name, user_link_href, comment_limit=self.user_comment_limit)
                     person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date, note="New User")
                     self.people[name] = person
                     #if 'test post for Red unicorn' in comment :
@@ -326,7 +334,7 @@ class WebpageHandler:
         #
         # codec file handle for serializing json (old code prob ok but this is consistent with csv code now)
         #        
-        str_filename = '..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.json'
+        str_filename = self.save_location + os.sep + self.save_file_name + '_' + self.webpage.name + '.json'
         write_handle = codecs.open( str_filename, 'w', 'utf-8', errors = 'replace' )
         write_handle.write( json.dumps(exported_data) + '\n' )
         write_handle.close()
@@ -391,8 +399,8 @@ class WebpageHandler:
         #
         # CSV serialization tab delimited code using codecs (to ensure upper range UTF-8 characters like emojis are serialized correctly)
         #
-        str_filename = '..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.csv'
-        str_filename_encoded = '..' + os.sep + 'crawler' + os.sep + 'exported_users' + os.sep + 'interesting_users_' + self.webpage.name + '.encoded.csv'
+        str_filename = self.save_location + os.sep + self.save_file_name + '_' + self.webpage.name + '.csv'
+        str_filename_encoded = self.save_location + os.sep + self.save_file_name + '_' + self.webpage.name + '.encoded.csv'
         write_handle = codecs.open( str_filename, 'w', 'utf-8', errors = 'replace' )
         write_handle_encoded = codecs.open( str_filename_encoded, 'w', 'utf-8', errors = 'replace' )
 
