@@ -60,7 +60,7 @@ class BaseSpider(scrapy.Spider):
         # Adding the web_director handler
         self.webpage_handler = custom_parser.create_webpage_handler()
         super().__init__(*args, **kwargs)
-
+    
     def start_requests(self):
         self.use_splash = using_splash(self.settings)
         for url in self.start_urls:
@@ -94,6 +94,7 @@ class BaseSpider(scrapy.Spider):
             ))
         meta = meta or {}
         meta['avoid_dup_content'] = True
+
         return cls(url, callback=callback, meta=meta, **kwargs)
 
     def parse_first(self, response):
@@ -117,6 +118,7 @@ class BaseSpider(scrapy.Spider):
         yield from self.parse(response)
 
     def parse(self, response):
+
         if not self.link_extractor.matches(response.url):
             return
 

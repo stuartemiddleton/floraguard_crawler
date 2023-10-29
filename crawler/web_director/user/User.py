@@ -11,7 +11,6 @@
 # Created Date : 2022/08/18
 # Project : FloraGuard
 # ######################################################################
-
 class UserInfo:
 
     def __init__(self, username, profile_url):
@@ -20,7 +19,8 @@ class UserInfo:
         self.attributes = {}
         self.profile_url = profile_url
 
-    def add_comment(self, comment, thread, url, date):
+    def add_comment(self, comment, thread, url, date, **kargs):
+
         if url in self.comments:
             # Limiting it to the most recent 100 comments in order to keep the memory impact low
             if len(self.comments) > 100:

@@ -56,6 +56,8 @@ class WebpageHandler:
     * Given the page content & URL, processes the html.
     * Returns True if all URLS on the page should be extracted, False otherwise.
     * --------------------------------------------------------------------------------- """
+
+
     def process(self, page, url):
         # Forum
         if issubclass(self.webpage.__class__, WebAbstractClass.WebpageAbstractClass):
@@ -132,9 +134,13 @@ class WebpageHandler:
             # Creating a new Person & their comment (if person already exists then just adding the comment)
             # note: if name is not found (e.g. profile regex not setup) then the whole comment will be ignored
             if name is not None and user_link is not None:
-                # Existing User
-                if name in self.people and comment not in self.people[name].get_all_comments():
-                    self.people[name].add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
+
+                #Existing user and comment
+                if (name in self.people) and (comment in self.people[name].get_all_comments()):
+                    continue
+                # Existing User but new comment
+                elif (name in self.people) and (comment not in self.people[name].get_all_comments()):
+                    self.people[name].add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date, note="Existing User")
                     #if 'test post for Red unicorn' in comment :
                     #    logging.info( 'NEW PERSON == ' + repr(self.people[name]) )
 
@@ -149,7 +155,7 @@ class WebpageHandler:
                         user_link_href = self.webpage.root_page_url + user_link_href[2:]
 
                     person = UserInfo(name, user_link_href)
-                    person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date)
+                    person.add_comment(comment, str(soup.find(**self.webpage.thread_name_regex()).text), url, date, note="New User")
                     self.people[name] = person
                     #if 'test post for Red unicorn' in comment :
                     #    logging.info( 'EXISTING PERSON == ' + repr(self.people[name]) )
@@ -158,6 +164,7 @@ class WebpageHandler:
             self.crawler_stats["Profiles scraped"] += 1
             if link != NOT_FOUND :
                 self.process(str(requests.get(link).text.encode('utf-8')), link)
+
 
         self.finish()
         logging.info('*** Saved ***')
@@ -332,8 +339,8 @@ class WebpageHandler:
 
         self.csv_export(exported_data)
 
-
     def csv_export(self, exported_data):
+
         csv_export = {"user": [], "comment": [], "thread_url": [], "profile_link": [], "thread_title": [], "date": []}
         ners = []
 
