@@ -22,6 +22,7 @@ Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
 - [Apache Ant 1.10.12](https://ant.apache.org/bindownload.cgi)
 - [Git](https://github.com/git-guides/install-git)
 - [Anaconda](https://www.anaconda.com/download)
+- [Python - If python not available on your computer](https://www.python.org/)
 
 ### Quick Installation for prerequisites
 
