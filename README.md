@@ -19,7 +19,7 @@ Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
 # Installation
 ## Step 1. Install the prerequisites *
 - [Java SE Development Kit 18](https://www.oracle.com/java/technologies/downloads/#jdk18-windows)
-- [Apache Ant 1.10.12](https://ant.apache.org/bindownload.cgi)
+- [Apache Ant 1.10.14](https://ant.apache.org/bindownload.cgi)
 - [Git](https://github.com/git-guides/install-git)
 - [Anaconda](https://www.anaconda.com/download)
 - [Python - If python not available on your computer](https://www.python.org/)
@@ -85,8 +85,8 @@ conda activate floraguard
 #
 
 sudo apt install dos2unix
-dos2unix environment_ubuntu.yml
-conda env create --name floraguard --file environment_ubuntu.yml
+dos2unix environment.yml
+conda env create --name floraguard --file environment.yml
 conda activate floraguard
 
 
