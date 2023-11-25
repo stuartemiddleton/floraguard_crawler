@@ -33,8 +33,28 @@ import logging
 from web_director.web_handler.WebpageHandler import WebpageHandler
 
 
+"""
+Paths constants
+
+defined relative to runner.py
+"""
+#main path relative to runner.py to where all resources are
+MAIN_RESOURCE_PATH = '..' + os.sep + 'resources' + os.sep
+
+#path to webpages config
+WEBPAGE_PATH = MAIN_RESOURCE_PATH + 'custom_webpages'
+
+#path to export user config
+EXPORTED_USERS_PATH = MAIN_RESOURCE_PATH + 'exported_users'
+
+#path to lexicons file
+LEXICON_PATH = MAIN_RESOURCE_PATH + 'lexicon'
+
+#path to where the run config is
+RUN_CONFIG_PATH = MAIN_RESOURCE_PATH + 'run_configs'
+
 def read_config():
-    path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'run_config.json'
+    path = RUN_CONFIG_PATH + os.sep + 'run_config.json'
     with open(path) as f:
         data = json.load(f)
     return data
@@ -43,9 +63,11 @@ def read_config():
 def create_custom_site(config):
     print("Searching for custom sites")
     name = config["name"]
-    path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'parser' + os.sep + 'custom_webpages'
-    for file in os.listdir(path):
-        with open(path + os.sep + file) as json_file:
+
+    #path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'parser' + os.sep + 'custom_webpages'
+
+    for file in os.listdir(WEBPAGE_PATH):
+        with open(WEBPAGE_PATH + os.sep + file) as json_file:
             data = json.load(json_file)
             if data["name"] not in name:
                 continue
@@ -127,7 +149,7 @@ def create_webpage_handler( timeout_hours = None ):
     data = read_config()
 
     #Option attributes
-    save_file_location = data["save_location"] if "save_location" in data else None
+    save_file_location = data["save_location"] if "save_location" in data else EXPORTED_USERS_PATH
     save_file_name = data["save_file_name"] if "save_file_name" in data else None
     user_comment_limit = data["user_comment_limit"] if "user_comment_limit" in data else None
 
@@ -156,7 +178,7 @@ def text_to_regex(dict):
 def read_txt(paths):
     regex = r"(?i)"
     for path in paths:
-        with open('..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'lexicon' + os.sep + path, encoding='utf-8') as f:
+        with open(LEXICON_PATH + os.sep + path, encoding='utf-8') as f:
             lines = f.readlines()
             if "excluded_terms" in path:
                 for i in range(0, len(lines)):

@@ -112,7 +112,7 @@ Crawler configuration files are in ./crawler/web_director
 Next we check website configuration is correct using the mock unicorn website. The script is run from ./crawler/scripts so the path parameter needs to go back two directories using the ../.. to find the crawler dir.
 
 ```
-ant test.config -Dpath=../../crawler/web_director/parser/custom_webpages/mock_site.json -Dthread_url=https://sohaibkarous.wixsite.com/mock-unicorn/forum/general-discussions/unicorns-and-unee-products-for-sale 
+ant test.config -Dpath=../../resources/custom_webpages/mock_site.json -Dthread_url=https://sohaibkarous.wixsite.com/mock-unicorn/forum/general-discussions/unicorns-and-unee-products-for-sale 
 ```
 If we see a message saying 'BUILD SUCCESSFUL' then the crawler is working.
 
@@ -123,11 +123,11 @@ First is the **website config**.  (**There are also two types of such confirgs: 
 how to "understand" the website you intend to crawl in the future. 
 That is, where every interesting block of information is 
 located on that website (e.g. title, price, location, comments).
-They are stored in `focussed_crawler/crawler/web_director/parser/custom_webpages`.
+They are stored in `focussed_crawler/resources/custom_webpages`.
 
 Second is the **run_config** which tells the crawler which one of those website configs you will be using at that time, 
 as well as other parameters regarding how the crawler is set up, such as whether to use anonymisation or not. 
-This one is located in `focussed_crawler/crawler/web_director/run_config.json`.
+This one is located in `focussed_crawler/resources/run_configs/run_config.json`.
 
 However, before we get to the Configs, we need to develop a search lexicon (or use an existing one).
 
@@ -138,7 +138,7 @@ Keywords of relevance to the species of interest are compiled to form a search l
 - **Excluded terms lexicon**: This enables certain terms to be excluded from the searches (e.g., the term “seeds” could be excluded, to focus the search on the trade in live plants). Terms to exclude may only become apparent after some preliminary searches have been performed and can be added to this lexicon to help screen out unwanted content that is appearing in the data set. 
 - **Entities of Interest lexicon**: This section of the lexicon can be used to search for specific entities of interest that emerge from initial rounds of searching. For instance, adding a certain vendor or platform name of interest to this lexicon, enables the AI tools to search for this specific entity within further rounds of searching, in addition to any other search lexicon terms.
 
-The search lexicons are dynamic tools, that can be searched in different combinations, and updated and refined ahead of each round of searching. Example lexicons can be found in ```focussed_crawler\crawler\web_director\lexicon```.
+The search lexicons are dynamic tools, that can be searched in different combinations, and updated and refined ahead of each round of searching. Example lexicons can be found in ```focussed_crawler\resources\lexicon```.
 Multiple species can be included in a single search lexicon. This broadens the search and enables links between species of interest to be found more easily. The optimum number of species depends on the amount of data each is likely to return, and the amount of time available to analyse the data. Search lexicons ranging from one to a dozen species are recommended as the most likely to produce manageable size data sets.
 
 _TIP: Coupled words do not need a “+” between them (e.g., Internet+buy should be written as Internet buy)._
@@ -222,7 +222,7 @@ ant crawl
 ```
 
 # Reviewing the captured data
-Once the crawl has finished, two files will be saved to ```focussed_crawler\crawler\exported_users``` (if anything of relevance to the keywords has been identified). These files are termed “interesting users_XXXX”, with the XXXX replaced with whatever name you gave the website in the configuration file.
+Once the crawl has finished, two files will be saved to ```focussed_crawler\resources\exported_users``` (if anything of relevance to the keywords has been identified). These files are termed “interesting users_XXXX”, with the XXXX replaced with whatever name you gave the website in the configuration file.
 One is an excel document (.csv) containing all the important information that was crawled from the website. The other is a .json file containing the crawled HTML data. 
 
 The excel document displays key data from each online post captured by the crawler, such as online user identify (unless hashed), relevant comments, time, date etc. 
@@ -236,15 +236,15 @@ Both the .csv and .json files can be combined with other analysis tools for furt
 # win10
 #
 
-dir crawler\exported_users
-type crawler\exported_users\interesting_users_mocked.json
+dir resources\exported_users
+type resources\exported_users\interesting_users_mocked.json
 
 #
 # ubuntu
 #
 
-ls -la crawler/exported_users
-cat crawler/exported_users/interesting_users_mocked.json
+ls -la resources/exported_users
+cat resources/exported_users/interesting_users_mocked.json
 ```
 
 # Visualisation
@@ -252,20 +252,20 @@ Once the crawl is completed we parse data and then visualise
 
 ```
 # parse and visualize mocked forum
-ant parse.crawled-data -Ddata=../../crawler/exported_users/interesting_users_mocked.json
-cp crawler/exported_users/parsed_data.json crawler/exported_users/parsed_data_mocked.json
-ls -la crawler/exported_users/parsed_data_mocked.json
+ant parse.crawled-data -Ddata=../../resources/exported_users/interesting_users_mocked.json
+cp resources/exported_users/parsed_data.json resources/exported_users/parsed_data_mocked.json
+ls -la resources/exported_users/parsed_data_mocked.json
 
-ant viz -Dconfig=../../config/viz_config.ini -Ddata-graph=../../crawler/exported_users/parsed_data_mocked.json
+ant viz -Dconfig=../../config/viz_config.ini -Ddata-graph=../../resources/exported_users/parsed_data_mocked.json
 cp build/bin/viz.png build/bin/viz_mocked.png
 ls -la build/bin/viz_mocked.png
 
 # parse and visualize ebay marketplace
-ant parse.crawled-data -Ddata=../../crawler/exported_users/interesting_users_ebay.json
-cp crawler/exported_users/parsed_data.json crawler/exported_users/parsed_data_ebay.json
-ls -la crawler/exported_users/parsed_data_ebay.json
+ant parse.crawled-data -Ddata=../../resources/exported_users/interesting_users_ebay.json
+cp resources/exported_users/parsed_data.json resources/exported_users/parsed_data_ebay.json
+ls -la resources/exported_users/parsed_data_ebay.json
 
-ant viz -Dconfig=../../config/viz_config.ini -Ddata-graph=../../crawler/exported_users/parsed_data_ebay.json
+ant viz -Dconfig=../../config/viz_config.ini -Ddata-graph=../../resources/exported_users/parsed_data_ebay.json
 cp build/bin/viz.png build/bin/viz_ebay.png
 ls -la build/bin/viz_ebay.png
 ```
