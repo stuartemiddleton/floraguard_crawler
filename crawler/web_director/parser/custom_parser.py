@@ -149,7 +149,14 @@ def create_webpage_handler( timeout_hours = None ):
     data = read_config()
 
     #Option attributes
-    save_file_location = data["save_location"] if "save_location" in data else EXPORTED_USERS_PATH
+    resource_location = {
+        "webpage_location": WEBPAGE_PATH,
+        "lexicon_location": LEXICON_PATH,
+        "run_configs_location": RUN_CONFIG_PATH,
+        "save_file_location": EXPORTED_USERS_PATH
+    }
+
+    #save_file_location = data["save_location"] if "save_location" in data else EXPORTED_USERS_PATH
     save_file_name = data["save_file_name"] if "save_file_name" in data else None
     user_comment_limit = data["user_comment_limit"] if "user_comment_limit" in data else None
 
@@ -157,8 +164,8 @@ def create_webpage_handler( timeout_hours = None ):
                                      get_thread_model(data),
                                      get_comment_model(data),
                                      data["comment_keyword_names"],
-                                     data["filter_comments"], data["anonymous"], 
-                                     save_location=save_file_location, 
+                                     data["filter_comments"], data["anonymous"],
+                                     resource_location=resource_location,
                                      save_file_name=save_file_name, 
                                      user_comment_limit=user_comment_limit)
     return webpage_handler

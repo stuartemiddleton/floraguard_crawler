@@ -49,7 +49,9 @@ class WebpageHandler:
         self.interesting_people = []
         self.anonymous = anonymous
         self.filter_comments = filter_comments
-        self.save_location = kargs["save_location"]
+        self.save_location = kargs["resource_location"]["save_file_location"]
+        self.webpage_config_location = kargs["resource_location"]["webpage_location"]
+        self.lexicon_config_location = kargs["resource_location"]["lexicon_location"]
         self.save_file_name = kargs["save_file_name"] if kargs["save_file_name"] != None else DEFAULT_SAVE_FILE
         self.user_comment_limit = kargs["user_comment_limit"] if kargs["user_comment_limit"] != None else DEFAULT_USER_COMMENT_LIMIT
         if self.webpage.timeout_hours != None :
@@ -356,7 +358,7 @@ class WebpageHandler:
             csv_export["description"] = []
 
         ######### CUSTOM NERS ##########
-        path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'lexicon'
+        path = self.lexicon_config_location
         for file in self.comment_keyword_names:
             res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
             csv_export["NER-" + res] = []
@@ -374,7 +376,7 @@ class WebpageHandler:
                     csv_export["date"].append(comment["date"])
                     csv_export["thread_title"].append(comment["thread"])
 
-                    path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'lexicon'
+                    path = self.lexicon_config_location
 
                     for file in self.comment_keyword_names:
                         regex = read_txt(path + os.sep + file)
