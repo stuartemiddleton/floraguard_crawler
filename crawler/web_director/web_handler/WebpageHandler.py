@@ -50,7 +50,7 @@ class WebpageHandler:
         self.anonymous = anonymous
         self.filter_comments = filter_comments
         self.save_location = kargs["save_location"]
-        self.save_file_name = kargs["save_file_name"] if kargs["save_location"] != None else DEFAULT_SAVE_FILE
+        self.save_file_name = kargs["save_file_name"] if kargs["save_file_name"] != None else DEFAULT_SAVE_FILE
         self.user_comment_limit = kargs["user_comment_limit"] if kargs["user_comment_limit"] != None else DEFAULT_USER_COMMENT_LIMIT
         if self.webpage.timeout_hours != None :
             self.timeout_hours = datetime.datetime.utcnow() + datetime.timedelta( hours=self.webpage.timeout_hours )
