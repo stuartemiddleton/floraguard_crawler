@@ -29,6 +29,7 @@ class SellerInfo:
                 "price": price,
                 "url": url,
                 "comment": title,
+                "thread": title,
                 "reviews": reviews
             })
         else:
@@ -38,6 +39,7 @@ class SellerInfo:
                 "price": price,
                 "url": url,
                 "comment": title,
+                "thread": title,
                 "reviews": reviews
             }]
 
@@ -54,11 +56,12 @@ class SellerInfo:
         all_comments = []
         for _, comment in self.comments.items():
             # Title is the 'comment'
-            comment_list = [x["comment"] for x in comment]
+            comment_list = [x["description"] for x in comment]
             all_comments += comment_list
 
-            for _, review in comment['reviews'].items():
-                all_comments += review.get_all_comments()
+            for x in comment:
+                for _, review in x['reviews'].items():
+                    all_comments += review.get_all_comments()
 
         return all_comments
 

@@ -355,6 +355,7 @@ class WebpageHandler:
                     filtered_comments = []
                     for comment in com_dict_list:
                         if self.comment_model.accept(comment["comment"]):
+                            comment = {k:v for k,v in comment.items() if k != "reviews"}
                             filtered_comments.append(comment)
                     if len(filtered_comments) == 0:
                         continue
