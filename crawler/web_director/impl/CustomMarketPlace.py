@@ -23,12 +23,20 @@ class CustomMarketPlace(MarketPlaceABC.MarketPlaceABC):
         self.general_start_page_url = ""
         self.general_item_url = ""
         self._sale_item_name_regex = {}
+        self._sale_item_description_regex = {}
         self._seller_name_regex = {}
         self._seller_description_regex = {}
         self._seller_url_regex = {}
-        self._seller_block_regex = {}
+        self._seller_block_regex = {}  #can remove
         self._price_regex = {}
         self._date_regex = {}
+        #Reviews
+        self._review_block_regex = {}
+        self._review_username_regex = {}
+        self._review_date_regex = {}
+        self._review_title_regex = {}
+        self._review_description_regex = {}
+        self._review_link_regex = {}
         self._attributes_regex = {}
 
     def get_root_page(self):
@@ -63,4 +71,25 @@ class CustomMarketPlace(MarketPlaceABC.MarketPlaceABC):
 
     def attributes_regex(self):
         return self._attributes_regex
+
+    def sale_item_description_regex(self):
+        return self._sale_item_description_regex
+
+    def review_block_regex(self):
+        return self._review_block_regex
+
+    def review_username_regex(self):
+        return self._review_username_regex
+
+    def review_date_regex(self):
+        return self._review_date_regex
+
+    def review_title_regex(self):
+        return self._review_title_regex
+
+    def review_description_regex(self):
+        return self._review_description_regex
+
+    def review_link_regex(self):
+        return self._review_link_regex
 
