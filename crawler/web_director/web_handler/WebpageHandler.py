@@ -39,6 +39,7 @@ DEFAULT_USER_COMMENT_LIMIT = 100
 class WebpageHandler:
 
     def __init__(self, webpage, thread_model, comment_model, comment_keyword_names, filter_comments, anonymous,
+                 ignore_reviews,
                  **kargs):
         if anonymous: logging.info("Anonymous crawling activated")
 
@@ -51,6 +52,7 @@ class WebpageHandler:
         self.interesting_people = []
         self.anonymous = anonymous
         self.filter_comments = filter_comments
+        self.ignore_reviews = ignore_reviews
         self.save_location = kargs["resource_location"]["save_file_location"]
         self.webpage_config_location = kargs["resource_location"]["webpage_location"]
         self.lexicon_config_location = kargs["resource_location"]["lexicon_location"]
@@ -264,39 +266,41 @@ class WebpageHandler:
 
             # REVIEWS
             # gets all the blocks with reviews for item
-            reviews = soup.findAll(**self.webpage.review_block_regex())
-
             review_users = {}
-            for review in reviews:
-                review_username = review.find(**self.webpage.review_username_regex())
+            if not (self.ignore_reviews):
+                reviews = soup.findAll(**self.webpage.review_block_regex())
 
-                # If there is no username then no need for review
-                if review_username is not None:
-                    username = self.performCheck(review_username, self.webpage.review_username_regex(),
-                                                 apply_anonymise=True)
+                for review in reviews:
+                    review_username = review.find(**self.webpage.review_username_regex())
 
-                    review_date = review.find(**self.webpage.review_date_regex())
-                    review_date = self.performCheck(review_date, self.webpage.review_date_regex())
+                    # If there is no username then no need for review
+                    if review_username is not None:
+                        username = self.performCheck(review_username, self.webpage.review_username_regex(),
+                                                     apply_anonymise=True)
 
-                    review_title = review.find(**self.webpage.review_title_regex())
-                    review_title = self.performCheck(review_title, self.webpage.review_title_regex())
+                        review_date = review.find(**self.webpage.review_date_regex())
+                        review_date = self.performCheck(review_date, self.webpage.review_date_regex())
 
-                    review_desc = review.find(**self.webpage.review_description_regex())
-                    review_desc = self.performCheck(review_desc, self.webpage.review_description_regex())
+                        review_title = review.find(**self.webpage.review_title_regex())
+                        review_title = self.performCheck(review_title, self.webpage.review_title_regex())
 
-                    review_link = review.find(**self.webpage.review_link_regex())
-                    review_link = self.performCheck(review_link, self.webpage.review_link_regex(), isLink=True,
-                                                    check_anonymise=True)
+                        review_desc = review.find(**self.webpage.review_description_regex())
+                        review_desc = self.performCheck(review_desc, self.webpage.review_description_regex())
 
-                    if (username in review_users) and (review_desc in review_users[username].get_all_comments()):
-                        continue
-                    elif (username in review_users) and (review_desc not in review_users[username].get_all_comments()):
-                        review_users[username].add_comment(review_desc, review_title, url, review_date,
-                                                           note="Existing User")
-                    else:
-                        review_user = UserInfo(username, review_link, comment_limit=self.user_comment_limit)
-                        review_user.add_comment(review_desc, review_title, url, review_date, note="New User")
-                        review_users[username] = review_user
+                        review_link = review.find(**self.webpage.review_link_regex())
+                        review_link = self.performCheck(review_link, self.webpage.review_link_regex(), isLink=True,
+                                                        check_anonymise=True)
+
+                        if (username in review_users) and (review_desc in review_users[username].get_all_comments()):
+                            continue
+                        elif (username in review_users) and (
+                                review_desc not in review_users[username].get_all_comments()):
+                            review_users[username].add_comment(review_desc, review_title, url, review_date,
+                                                               note="Existing User")
+                        else:
+                            review_user = UserInfo(username, review_link, comment_limit=self.user_comment_limit)
+                            review_user.add_comment(review_desc, review_title, url, review_date, note="New User")
+                            review_users[username] = review_user
 
             if seller_name in self.people:
                 self.people[seller_name].add_item(url, item_description, date, price, item_name, review_users,
@@ -311,7 +315,7 @@ class WebpageHandler:
                 for n, regex in self.webpage.attributes_regex().items():
                     for data in soup.find_all(**regex):
                         self.people[seller_name].add_attribute(n, data.get_text())
-        #TODO: optimise direct_crawler and finish for item page handling
+
         self.direct_crawler()
 
         self.finish()
@@ -355,7 +359,22 @@ class WebpageHandler:
                     filtered_comments = []
                     for comment in com_dict_list:
                         if self.comment_model.accept(comment["comment"]):
-                            comment = {k:v for k,v in comment.items() if k != "reviews"}
+                            #new_comment = {k: v for k, v in comment.items() if k != "reviews"}
+
+                            if "reviews" in comment and not (self.ignore_reviews):
+                                review_list = []
+
+                                for _, review in comment["reviews"].items():
+                                    review_comments = review.comments
+
+                                    for _, review_dict_list in review_comments.items():
+
+                                        for review_dict in review_dict_list:
+                                            if self.comment_model.accept(review_dict["comment"]):
+                                                review_list.append(review_dict)
+
+                                comment["reviews"] = review_list
+
                             filtered_comments.append(comment)
                     if len(filtered_comments) == 0:
                         continue
@@ -395,6 +414,9 @@ class WebpageHandler:
         if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
             csv_export["price"] = []
             csv_export["description"] = []
+            if not (self.ignore_reviews):
+                csv_export["review"] = []
+                csv_export["review title"] = []
 
         ######### CUSTOM NERS ##########
         path = self.lexicon_config_location
@@ -403,6 +425,18 @@ class WebpageHandler:
             csv_export["NER-" + res] = []
             ners.append("NER-" + res)
         ################################
+
+        reviews = {}
+
+        def addNERTags(comment):
+            for comment_file in self.comment_keyword_names:
+                regex = read_txt(path + os.sep + comment_file)
+                ner_tags = []
+                comment_res = comment_file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
+                for words in re.findall(regex, comment):
+                    ner_tags.append("NER-" + comment_res + ":" + str(words))
+
+                csv_export["NER-" + comment_res].append(ner_tags)
 
         for k, v in exported_data.items():
             for url, comments in exported_data[k]["comments"].items():
@@ -417,19 +451,25 @@ class WebpageHandler:
 
                     path = self.lexicon_config_location
 
-                    for file in self.comment_keyword_names:
-                        regex = read_txt(path + os.sep + file)
-                        ner_tags = []
-                        res = file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
-                        for words in re.findall(regex, comment["comment"]):
-                            ner_tags.append("NER-" + res + ":" + str(words))
-
-                        csv_export["NER-" + res].append(ner_tags)
                     ################################
 
                     if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
                         csv_export["price"].append(comment["price"])
                         csv_export["description"].append(comment["description"])
+                        addNERTags(comment["description"])
+
+                        if not (self.ignore_reviews):
+
+                            for review in comment["reviews"]:
+                                csv_export["comment"].append(comment["comment"])
+                                csv_export["thread_url"].append(review["url"])
+                                csv_export["review"].append(review["comment"])
+                                csv_export["review title"].append(review["thread"])
+
+                                addNERTags(review["comment"])
+
+                    else:
+                        addNERTags(comment["comment"])
 
         if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
             csv_export.pop("thread_title")

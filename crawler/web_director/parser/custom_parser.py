@@ -171,7 +171,7 @@ def create_webpage_handler( timeout_hours = None ):
                                      get_thread_model(data),
                                      get_comment_model(data),
                                      data["comment_keyword_names"],
-                                     data["filter_comments"], data["anonymous"],
+                                     data["filter_comments"], data["anonymous"],data["ignore_reviews"],
                                      resource_location=resource_location,
                                      save_file_name=save_file_name, 
                                      user_comment_limit=user_comment_limit)
