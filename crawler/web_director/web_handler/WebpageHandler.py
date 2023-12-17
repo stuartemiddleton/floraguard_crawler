@@ -501,6 +501,7 @@ class WebpageHandler:
         # data rows (one per post/comment)
         for i in range(len(csv_export[list_keys[0]])):
             for key in list_keys:
+                #If there is not enough information, then ignore
                 try:
                     element = csv_export[key][i]
                 except:
