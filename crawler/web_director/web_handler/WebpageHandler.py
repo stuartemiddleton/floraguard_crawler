@@ -359,7 +359,7 @@ class WebpageHandler:
                     filtered_comments = []
                     for comment in com_dict_list:
                         if self.comment_model.accept(comment["comment"]):
-                            #new_comment = {k: v for k, v in comment.items() if k != "reviews"}
+                            new_comment = {k: v for k, v in comment.items() if k != "reviews"}
 
                             if "reviews" in comment and not (self.ignore_reviews):
                                 review_list = []
@@ -373,9 +373,9 @@ class WebpageHandler:
                                             if self.comment_model.accept(review_dict["comment"]):
                                                 review_list.append(review_dict)
 
-                                comment["reviews"] = review_list
+                                new_comment["reviews"] = review_list
 
-                            filtered_comments.append(comment)
+                            filtered_comments.append(new_comment)
                     if len(filtered_comments) == 0:
                         continue
 
@@ -438,6 +438,7 @@ class WebpageHandler:
 
                 csv_export["NER-" + comment_res].append(ner_tags)
 
+
         for k, v in exported_data.items():
             for url, comments in exported_data[k]["comments"].items():
                 for comment in comments:
@@ -450,13 +451,15 @@ class WebpageHandler:
                     csv_export["thread_title"].append(comment["thread"])
 
                     path = self.lexicon_config_location
-
+                    addNERTags(comment["comment"])
                     ################################
 
                     if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
                         csv_export["price"].append(comment["price"])
                         csv_export["description"].append(comment["description"])
+
                         addNERTags(comment["description"])
+
 
                         if not (self.ignore_reviews):
 
@@ -467,9 +470,6 @@ class WebpageHandler:
                                 csv_export["review title"].append(review["thread"])
 
                                 addNERTags(review["comment"])
-
-                    else:
-                        addNERTags(comment["comment"])
 
         if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
             csv_export.pop("thread_title")
@@ -501,7 +501,10 @@ class WebpageHandler:
         # data rows (one per post/comment)
         for i in range(len(csv_export[list_keys[0]])):
             for key in list_keys:
-                element = csv_export[key][i]
+                try:
+                    element = csv_export[key][i]
+                except:
+                    element = NOT_FOUND
                 if element != NOT_FOUND:
                     # use json encoded strings to escape (a) newlines and tabs and (b) upper range UTF-8 entries
                     # dont bother with the "" as these are all strings

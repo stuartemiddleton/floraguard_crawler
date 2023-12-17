@@ -56,8 +56,10 @@ class SellerInfo:
         all_comments = []
         for _, comment in self.comments.items():
             # Title is the 'comment'
-            comment_list = [x["description"] for x in comment]
-            all_comments += comment_list
+            desc_list = [x["description"] for x in comment]
+            title_list = [x["comment"] for x in comment]
+            all_comments += desc_list
+            all_comments += title_list
 
             for x in comment:
                 for _, review in x['reviews'].items():
