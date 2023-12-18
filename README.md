@@ -23,10 +23,11 @@ Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
 - [Git](https://github.com/git-guides/install-git)
 - [Anaconda](https://www.anaconda.com/download)
 - [Python - If python not available on your computer](https://www.python.org/)
+  - The version of python is recommended to be the latest stable version. If in doubt, recommended version: **3.9+**.
 
 ### Quick Installation for prerequisites
 
-1) Install java and git to default locations (they will setup environment variables automatically)
+1) Install java, git and python (if previously not installed) to default locations (they will setup environment variables automatically)
 2) Install ant to a known location e.g. c:\ant
 3) Install anaconda to a known location e.g. c:\conda
 4) WIN10 powershell - set environment variables for Apache ant and Anaconda using following commands (avoiding need for admin rights)
@@ -108,7 +109,7 @@ py -m pip install -r requirements.txt
 ## Step 4. Testing the crawler is set up correctly
 
 Crawler scripts are in ./crawler/scripts
-Crawler configuration files are in ./crawler/web_director
+Crawler configuration files are in ./resources
 
 Next we check website configuration is correct using the mock unicorn website. The script is run from ./crawler/scripts so the path parameter needs to go back two directories using the ../.. to find the crawler dir.
 
@@ -170,21 +171,27 @@ Forums are configured according to the following criteria:
 ## Website Config [Marketplace]
 Marketplaces are configured according to the following HTML blocks:
 
-| Parameter name | Description |
-| :---   | :--- | 
-| “name” | This can be anything, but must match your .json configuration file name.|
-| “type” | Here, enter: “marketplace”.|
-| “root_page_url” | This is the first URL of the website you are crawling.|
-| “general_items_url” | This is the area of the website that you want the crawler to start from, for instance a specific menu or part of the website.|
-| “general_item_url” | This is the part of the URL that is common to all listings when you open them. Open a few to see what repeats, and add this to the configuration file.|
-| “sale_item_name_regex” | Within the item listing, this is the item name, which can be selected using the selection tool.|
-| “seller_description_regex” | Within the item listing, this is the descriptive text about the item.|
-| “seller_block_regex” | This is the information relating to the seller. If available, select the entire block.|
-| “seller_name_regex” | Here, select just the seller’s name.|
-| “seller_url_regex” | Here, select just the seller’s URL link.|
-| “price_regex” | Here, select the price.|
-| “date_regex” | If available, here select the date that the item was first posted.|
-| “attributes_regex” | Additional bespoke features of the forum can be captured using this function.| 
+| Parameter name | Description                                                                                                                                            |
+| :---   |:-------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| “name” | This can be anything, but must match your .json configuration file name.                                                                               |
+| “type” | Here, enter: “marketplace”.                                                                                                                            |
+| “root_page_url” | This is the first URL of the website you are crawling.                                                                                                 |
+| “general_items_url” | This is the area of the website that you want the crawler to start from, for instance a specific menu or part of the website.                          |
+| “general_item_url” | This is the part of the URL that is common to all listings when you open them. Open a few to see what repeats, and add this to the configuration file. |
+| “sale_item_name_regex” | Within the item listing, this is the item name, which can be selected using the selection tool.                                                        |
+ | "sale_item_description_regex" | Within the item listing, this is the descriptive text about the item.                                                                                  |
+| “seller_name_regex” | Here, select just the seller’s name.                                                                                                                   |
+| “seller_url_regex” | Here, select just the seller’s URL link.                                                                                                               |
+| “seller_description_regex” | Here, this is the descriptive text about the seller.                                                                                                   |
+| “price_regex” | Here, select the price.                                                                                                                                |
+| “date_regex” | If available, here select the date that the item was first posted.                                                                                     |
+| "review_block_regex" | If available, much like "block_regex" in forum config, get the repeating HTML tags for blocks of reviews for the item                                  |
+|"review_username_regex"| If available, this is ther username of the reviewer                                                                                                    |
+|"review_date_regex"| If avaialble, this is the date the review posted                                                                                                       |
+|"review_title_regex"| If avaialble, this is the title for the review (OPTIONAL)                                                                                              |
+|"review_description_regex"| If avaialble, this is the comment made by the reviewer                                                                                                 |
+|"review_link_regex"| In this case, like the "profile_link_regex", find the <a> tag by the username of the reviewer or the link to the reviewer's page                       |
+| “attributes_regex” | Additional bespoke features of the forum can be captured using this function.                                                                          | 
 
 ## Website configuration Tips
 | Parameter name | Description |
@@ -200,19 +207,21 @@ Marketplaces are configured according to the following HTML blocks:
 
 ## The "run_config.json" 
 
-| Parameter name | Description |
-| :---   | :--- | 
-| “name” |  This is the website name that you defined in the webpage configuration file. |
-| “type” | Whether that website is a forum or a marketplace. |
-| “depth” | How far you want the crawler to explore the website. The bigger the number the further it explores. Note this expansion of the search is exponential e.g., depth = 1 -> 30 pages, depth = 2 -> 800 pages, depth = 3 -> 30,000 pages. **For most websites, a search depth of 7 or 8 is recommended. For the mock forum, which contains a small amount of data, a depth search of 100 can be used.** |
-| “comment_model” | The model needed for directing the crawler. **Leave it as “keyword”.** |
-| “thread_model” | The model needed for directing the crawler. **Leave it as “all”** |
-| “filter_comments” | “False” to capture all comments, or “true” to capture only interesting ones that relate to the keywords. **Leave as “true”.**|
-| “comment_length”  | How many comments are needed before exporting? **Leave as 0.** |
-| “anonymous” | This “hashes” (replaces with a numerical code) the usernames of all the individuals identified in the crawl. This important function enables crawls to screen out people’s names from the data that is captured, in instances where this type of sensitive personal data is not required for data analysis. The entry here answers a question posed by the algorithm – should data be anonymous or not? Therefore, set to **true** if you want to capture anonymous data (i.e. personal data hashed), and set to **false** if you want the crawl to capture all personal data, unfiltered. |
-| “use_comment_file” | This directs the algorithm to use the search lexicon files. Set to true to use existing lexicon files, or false to create your own. **Leave as true.** |
-| “comment_keyword_names”  | This is where you **input the file names of the lexicons that you have created.** For instance, entering Unicorns.txt would direct the algorithm to make use of the search lexicon saved under this name. More than one lexicon can be entered, including those for excluded terms and lexicons containing additional information added after preliminary crawling and analysis. |
-|  "thread_keyword" | This is where a custom lexicon for searching forum thread titles only can be entered. **Leave as {}**.|
+| Parameter name          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|:------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| “name”                  | This is the website name that you defined in the webpage configuration file.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| “type”                  | Whether that website is a forum or a marketplace.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| “depth”                 | How far you want the crawler to explore the website. The bigger the number the further it explores. Note this expansion of the search is exponential e.g., depth = 1 -> 30 pages, depth = 2 -> 800 pages, depth = 3 -> 30,000 pages. **For most websites, a search depth of 7 or 8 is recommended. For the mock forum, which contains a small amount of data, a depth search of 100 can be used.**                                                                                                                                                                                         |
+| “comment_model”         | The model needed for directing the crawler. **Leave it as “keyword”.**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| “thread_model”          | The model needed for directing the crawler. **Leave it as “all”**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| “filter_comments”       | “false” to capture all comments, or “true” to capture only interesting ones that relate to the keywords. **Leave as “true”.**                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| "ignore_reviews"         | "false" to ignore reviews for Marketplace items. "true" to capture reviews and use AI tool on reviews to find interesting items.                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| “comment_length”        | How many comments are needed before exporting? **Leave as 0.**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| “anonymous”             | This “hashes” (replaces with a numerical code) the usernames of all the individuals identified in the crawl. This important function enables crawls to screen out people’s names from the data that is captured, in instances where this type of sensitive personal data is not required for data analysis. The entry here answers a question posed by the algorithm – should data be anonymous or not? Therefore, set to **true** if you want to capture anonymous data (i.e. personal data hashed), and set to **false** if you want the crawl to capture all personal data, unfiltered. |
+| “use_comment_file”      | This directs the algorithm to use the search lexicon files. Set to true to use existing lexicon files, or false to create your own. **Leave as true.**                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| “comment_keyword_names” | This is where you **input the file names of the lexicons that you have created.** For instance, entering Unicorns.txt would direct the algorithm to make use of the search lexicon saved under this name. More than one lexicon can be entered, including those for excluded terms and lexicons containing additional information added after preliminary crawling and analysis.                                                                                                                                                                                                           |
+| "thread_keyword"        | This is where a custom lexicon for searching forum thread titles only can be entered. **Leave as {}**.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| "timeout_hours"         | This is the specified timeout for the crawler. Advised to use this to run the crawler for a specific amount of hours. To run indefinetly, set to NONE or do not inclue.                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 # Running the crawler
 Once you set up the config for the website you want to crawl and updated the run_config and checked you are withing the environment we created earlier, 
