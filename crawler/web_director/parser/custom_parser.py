@@ -86,7 +86,12 @@ def create_custom_site(config):
                 webpage._date_regex = data["date_regex"]
                 webpage._attributes_regex = data["attributes_regex"]
                 if "timeout_hours" in config :
-                    webpage.timeout_hours = config["timeout_hours"]
+                    timeout = config["timeout_hours"]
+
+                    if timeout == -1:
+                        webpage.timeout_hours = None
+                    else:
+                        webpage.timeout_hours = timeout
                 else :
                     webpage.timeout_hours = None
                 return webpage
@@ -102,7 +107,6 @@ def create_custom_site(config):
                 webpage._seller_url_regex = data["seller_url_regex"]
                 webpage._date_regex = data["date_regex"]
                 webpage._price_regex = data["price_regex"]
-                webpage._seller_block_regex = data["seller_block_regex"]   #can remove
                 webpage._review_block_regex = data["review_block_regex"]
                 webpage._review_username_regex = data["review_username_regex"]
                 webpage._review_date_regex = data["review_date_regex"]
@@ -111,7 +115,12 @@ def create_custom_site(config):
                 webpage._review_link_regex = data["review_link_regex"]
                 webpage._attributes_regex = data["attributes_regex"]
                 if "timeout_hours" in config :
-                    webpage.timeout_hours = config["timeout_hours"]
+                    timeout = config["timeout_hours"]
+
+                    if timeout == -1:
+                        webpage.timeout_hours = None
+                    else:
+                        webpage.timeout_hours = timeout
                 else :
                     webpage.timeout_hours = None
                 return webpage
@@ -160,10 +169,9 @@ def create_webpage_handler( timeout_hours = None ):
         "webpage_location": WEBPAGE_PATH,
         "lexicon_location": LEXICON_PATH,
         "run_configs_location": RUN_CONFIG_PATH,
-        "save_file_location": EXPORTED_USERS_PATH
+        "save_file_location": data["save_location"] if "save_location" in data else EXPORTED_USERS_PATH
     }
 
-    #save_file_location = data["save_location"] if "save_location" in data else EXPORTED_USERS_PATH
     save_file_name = data["save_file_name"] if "save_file_name" in data else None
     user_comment_limit = data["user_comment_limit"] if "user_comment_limit" in data else None
 

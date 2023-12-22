@@ -32,18 +32,21 @@ import codecs, json
 NOT_FOUND = 'NOT FOUND'
 
 # Default values
-DEFAULT_SAVE_FILE = "interesting_users"
-DEFAULT_USER_COMMENT_LIMIT = 100
+
 
 
 class WebpageHandler:
+
+    DEFAULT_SAVE_FILE = "interesting_users"
+    DEFAULT_USER_COMMENT_LIMIT = 100
+    FILE_RUN_EXTENSION = "run_1"
 
     def __init__(self, webpage, thread_model, comment_model, comment_keyword_names, filter_comments, anonymous,
                  ignore_reviews,
                  **kargs):
         if anonymous: logging.info("Anonymous crawling activated")
 
-        self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0}
+        self.crawler_stats = {"Threads seen": 0, "Profiles scraped": 0, "Interesting Users Found": 0}
         self.webpage = webpage
         self.thread_model = thread_model
         self.comment_model = comment_model
@@ -56,19 +59,33 @@ class WebpageHandler:
         self.save_location = kargs["resource_location"]["save_file_location"]
         self.webpage_config_location = kargs["resource_location"]["webpage_location"]
         self.lexicon_config_location = kargs["resource_location"]["lexicon_location"]
-        self.save_file_name = kargs["save_file_name"] if kargs["save_file_name"] != None else DEFAULT_SAVE_FILE
-        self.user_comment_limit = kargs["user_comment_limit"] if kargs[
-                                                                     "user_comment_limit"] != None else DEFAULT_USER_COMMENT_LIMIT
-        if self.webpage.timeout_hours != None:
+        self.save_file_name = kargs["save_file_name"] if kargs["save_file_name"] is not None else self.DEFAULT_SAVE_FILE
+
+        self.updateRunValue()
+
+        self.user_comment_limit = kargs["user_comment_limit"] if kargs["user_comment_limit"] is not None else self.DEFAULT_USER_COMMENT_LIMIT
+        if self.webpage.timeout_hours is not None:
             self.timeout_hours = datetime.datetime.utcnow() + datetime.timedelta(hours=self.webpage.timeout_hours)
         else:
             self.timeout_hours = None
+
+        self.attributes_export = list(self.webpage.attributes_regex().keys())
         logging.info('*** crawl webpage handler init - timeout ' + str(self.timeout_hours) + ' ***')
 
     """ -----------------------------------------------------------------------------------
     * Given the page content & URL, processes the html.
     * Returns True if all URLS on the page should be extracted, False otherwise.
     * --------------------------------------------------------------------------------- """
+
+    def updateRunValue(self):
+
+        same_file_extensions = [file for file in os.listdir(self.save_location) if (self.save_file_name in file) and ("run" in file)]
+
+        if len(same_file_extensions) != 0:
+            run_numbers = [eval(file.split("run_")[1].split("_")[0]) for file in same_file_extensions]
+
+            self.FILE_RUN_EXTENSION = "run_{}".format(max(run_numbers) + 1)
+
 
     def process(self, page, url):
         # Forum
@@ -233,9 +250,16 @@ class WebpageHandler:
 
     def item_page_handler(self, page, url):
         soup = BeautifulSoup(page, 'html.parser', from_encoding='utf-8')
-
+        self.crawler_stats["Threads seen"] += 1
         # ITEM
-        item_name = soup.find(**self.webpage.sale_item_name_regex())
+        sale_item_name_regex = self.webpage.sale_item_name_regex()
+        if "inside_tag" in sale_item_name_regex and sale_item_name_regex["inside_tag"] != {}:
+            item_name_block_regex = {k: v for k, v in self.webpage.sale_item_name_regex().items() if k != "inside_tag"}
+
+            item_name_block = soup.find(**item_name_block_regex)
+            item_name = item_name_block.find(**sale_item_name_regex["inside_tag"])
+        else:
+            item_name = soup.find(**sale_item_name_regex)
 
         # if there is no item name then it is highly likely there is no item listed in this page
         # The rest of the information is scraped iff an item name exits
@@ -338,7 +362,7 @@ class WebpageHandler:
                     if person.get_profile_url() != NOT_FOUND:
                         profile_links.append(person.get_profile_url())
                     self.interesting_people.append(username)
-
+                    self.crawler_stats["Interesting Users Found"] += 1
         return profile_links
 
     """
@@ -393,7 +417,7 @@ class WebpageHandler:
         #
         # codec file handle for serializing json (old code prob ok but this is consistent with csv code now)
         #        
-        str_filename = self.save_location + os.sep + self.save_file_name + '_' + self.webpage.name + '.json'
+        str_filename = self.save_location + os.sep + self.save_file_name + '_' + self.FILE_RUN_EXTENSION + '_' + self.webpage.name + '.json'
         write_handle = codecs.open(str_filename, 'w', 'utf-8', errors='replace')
         write_handle.write(json.dumps(exported_data) + '\n')
         write_handle.close()
@@ -410,6 +434,9 @@ class WebpageHandler:
 
         csv_export = {"user": [], "comment": [], "thread_url": [], "profile_link": [], "thread_title": [], "date": []}
         ners = []
+
+        for attribute in self.attributes_export:
+            csv_export[attribute] = []
 
         if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
             csv_export["price"] = []
@@ -428,13 +455,22 @@ class WebpageHandler:
 
         reviews = {}
 
-        def addNERTags(comment):
+        def addNERTags(comment, description=None, reviews=None):
             for comment_file in self.comment_keyword_names:
                 regex = read_txt(path + os.sep + comment_file)
                 ner_tags = []
                 comment_res = comment_file.replace(".txt", "").replace("_", " ").title().replace(" ", "")
                 for words in re.findall(regex, comment):
                     ner_tags.append("NER-" + comment_res + ":" + str(words))
+
+                if description is not None:
+                    for words in re.findall(regex, description):
+                        ner_tags.append("NER-" + comment_res + ":" + str(words))
+
+                if reviews is not None:
+                    for review in reviews:
+                        for words in re.findall(regex, review):
+                            ner_tags.append("NER-" + comment_res + ":" + str(words))
 
                 csv_export["NER-" + comment_res].append(ner_tags)
 
@@ -451,25 +487,35 @@ class WebpageHandler:
                     csv_export["thread_title"].append(comment["thread"])
 
                     path = self.lexicon_config_location
-                    addNERTags(comment["comment"])
+
                     ################################
 
                     if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
                         csv_export["price"].append(comment["price"])
                         csv_export["description"].append(comment["description"])
 
-                        addNERTags(comment["description"])
-
 
                         if not (self.ignore_reviews):
 
-                            for review in comment["reviews"]:
-                                csv_export["comment"].append(comment["comment"])
-                                csv_export["thread_url"].append(review["url"])
-                                csv_export["review"].append(review["comment"])
-                                csv_export["review title"].append(review["thread"])
+                            all_review_comments = []
+                            all_review_urls = []
+                            all_review_titles = []
 
-                                addNERTags(review["comment"])
+                            for review in comment["reviews"]:
+                                all_review_comments.extend(review["comment"])
+                                all_review_titles.extend(review["thread"])
+                                all_review_urls.extend((review["url"]))
+
+                            csv_export["thread_url"].append(all_review_urls)
+                            csv_export["review"].append(all_review_comments)
+                            csv_export["review title"].append(all_review_titles)
+
+                            addNERTags(comment["comment"], description=comment["description"], reviews=all_review_comments)
+                        else:
+                            addNERTags(comment["comment"], description=comment["description"])
+                    else:
+                        addNERTags(comment["comment"])
+
 
         if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
             csv_export.pop("thread_title")
@@ -479,8 +525,8 @@ class WebpageHandler:
         #
         # CSV serialization tab delimited code using codecs (to ensure upper range UTF-8 characters like emojis are serialized correctly)
         #
-        str_filename = self.save_location + os.sep + self.save_file_name + '_' + self.webpage.name + '.csv'
-        str_filename_encoded = self.save_location + os.sep + self.save_file_name + '_' + self.webpage.name + '.encoded.csv'
+        str_filename = self.save_location + os.sep + self.save_file_name + '_' + self.FILE_RUN_EXTENSION + '_' + self.webpage.name + '.csv'
+        str_filename_encoded = self.save_location + os.sep + self.save_file_name + '_' + self.FILE_RUN_EXTENSION + '_' + self.webpage.name + '.encoded.csv'
         write_handle = codecs.open(str_filename, 'w', 'utf-8', errors='replace')
         write_handle_encoded = codecs.open(str_filename_encoded, 'w', 'utf-8', errors='replace')
 

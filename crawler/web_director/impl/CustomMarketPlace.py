@@ -27,7 +27,6 @@ class CustomMarketPlace(MarketPlaceABC.MarketPlaceABC):
         self._seller_name_regex = {}
         self._seller_description_regex = {}
         self._seller_url_regex = {}
-        self._seller_block_regex = {}  #can remove
         self._price_regex = {}
         self._date_regex = {}
         #Reviews
