@@ -231,6 +231,13 @@ running the crawler is as simple as running ``` ant crawl ``` in your terminal.
 ant crawl
 ```
 
+To run the crawler in the background and store the outputs into a file, run the following command. This ensures the program runs even if the terminal is closed or when the SSH connection is lost.
+
+```
+nohup ant crawl > output.txt &
+```
+This command stores any outputs of the run into the file output.txt
+
 # Reviewing the captured data
 Once the crawl has finished, two files will be saved to ```focussed_crawler\resources\exported_users``` (if anything of relevance to the keywords has been identified). These files are termed “interesting users_XXXX”, with the XXXX replaced with whatever name you gave the website in the configuration file.
 One is an excel document (.csv) containing all the important information that was crawled from the website. The other is a .json file containing the crawled HTML data. 
