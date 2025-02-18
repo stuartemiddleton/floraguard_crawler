@@ -71,10 +71,11 @@ conda config --prepend pkgs_dirs /conda/pkgs
 conda config --prepend envs_dirs /conda/envs
 conda config --show
 conda init powershell
-conda env create --name floraguard --file environment.yml
+conda env create --name floraguard --file requirements/environment.yml
 conda activate floraguard
 
-# environment.yml found in cloned repository
+# environment.yml found in requirements folder
+# OS specific conda environments are also provided in the folder.
 # use 'deactivate' to leave conda environment
 
 #
