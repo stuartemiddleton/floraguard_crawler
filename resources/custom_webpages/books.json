@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:1f2974cf4425a46d2811e77d99afcbfc905385fef7eac0c0059eaf516132eb90
-size 868
+{
+  "name": "books",
+  "type": "marketplace",
+  "root_page_url" : "https://egianfrancesco3.wixsite.com/westmacott-books",
+  "general_items_url" : "https://egianfrancesco3.wixsite.com/westmacott-books/category/all-products",
+  "general_item_url" : "https://egianfrancesco3.wixsite.com/westmacott-books/product-page/",
+  "sale_item_name_regex" : {"name" :"h1", "class_" : "_2qrJF"},
+  "sale_item_description_regex" : {"name": "div",  "class_" :  "_3cRjW"},
+  "seller_description_regex" : {},
+  "seller_name_regex" : {},
+  "seller_url_regex" : {},
+  "date_regex" : {},
+  "price_regex" : {"name" :  "span", "data-hook" :  "formatted-primary-price"},
+  "review_block_regex": {},
+  "review_username_regex": {},
+  "review_date_regex": {},
+  "review_title_regex": {},
+  "review_description_regex": {},
+  "review_link_regex": {},
+  "attributes_regex" : {}
+}

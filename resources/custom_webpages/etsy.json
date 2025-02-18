@@ -1,3 +1,16 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:2ab3821f11b567c88d1fda5a208b518d9a7459de49dc61e616cb86788b0d3477
-size 843
+{
+  "name": "etsy",
+  "type": "marketplace",
+  "root_page_url" : "https://www.etsy.com/",
+  "general_items_url" : "https://www.etsy.com/uk/search?q=Conophytum",
+  "general_item_url" : "https://www.etsy.com/uk/listing/",
+  "sale_item_name_regex" : {"name" :"h1", "class_" : "wt-text-body-03 wt-line-height-tight wt-break-word wt-mb-xs-1"},
+  "seller_description_regex" : {"name": "p",  "class_" :  "wt-text-body-01 wt-break-word"},
+  "seller_block_regex" : {"name" :  "div", "id" :  "desktop_shop_owners_parent"},
+  "seller_name_regex" : {"name": "a","class_" : "wt-text-link" },
+  "seller_url_regex" : {"name": "a","class_" : "wt-text-link" },
+  "date_regex" : {"name" :  "div", "class_" :  "wt-pr-xs-2 wt-text-caption"},
+  "price_regex" : {"name" :  "p", "class_" :  "wt-text-title-03 wt-mr-xs-1"},
+  "attributes_regex" : {}
+
+}

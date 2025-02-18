@@ -1,3 +1,21 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:07047ef7a16d8955dd669a63424f99f44f89c195ebb5bc7b1243db9b7e62d742
-size 1094
+{
+  "name" : "mocked",
+  "type" : "forum",
+  "root_page_url": "https://sohaibkarous.wixsite.com/mock-unicorn",
+  "general_threads_page_url" : "https://sohaibkarous.wixsite.com/mock-unicorn/forum/",
+  "general_thread_url" : "https://sohaibkarous.wixsite.com/mock-unicorn/forum/",
+  "general_profile_url" : "https://sohaibkarous.wixsite.com/",
+  "thread_name_regex" : {"name" : "div", "class_" : "NWUMmd"},
+  "block_regex" : {"name" :  "div" , "class_" :  ["TD_VuS","sgEKh8 top-level-comment", "sC_Tkp9 wc-app-desktop", "sUxkE8_"]},
+  "comment_regex" : {"name" : "div", "class_" :  ["hl-xW"]},
+  "profile_regex" : {"name" : "div", "class_" :  ["mzrlgz","r05Xnt","EcX0n5","svBHxDu"]},
+  "profile_name_regex" : {"name" : "span", "class_":  ["ZREX02 forum-text-color forum-link-hover-color", "s__1Rtiwz"]},
+  "profile_link_regex" : {"name" : "a"},
+  "date_regex" : {"name" :  "span", "class" : ["NGGLat TRnkW5 time-ago", "s__7oOHwa"]},
+  "attributes_regex": {"username": {"name" :  "h2", "class_": "forum-title"}, "user_stats" : {"name" :  "dl", "class_" : "details" } }
+}
+
+
+
+
+

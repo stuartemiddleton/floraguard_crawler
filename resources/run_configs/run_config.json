@@ -1,3 +1,18 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:2a3812053f2c4996a02e468ef1e37e8b7a758398e056656ed7d2358f678c4023
-size 370
+{
+  "name": "books",
+  "type" : "marketplace",
+  "depth": "100",
+  "comment_model": "keyword",
+  "thread_model": "all",
+  "filter_comments" : true,
+  "ignore_reviews" : false,
+  "comment_length" : 0,
+  "anonymous" : false,
+  "use_comment_file" : true,
+  "comment_keyword_names" : [
+    "books.txt"
+  ],
+  "thread_keyword": {},
+  "timeout_hours": -1
+}
+

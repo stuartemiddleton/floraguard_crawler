@@ -1,3 +1,16 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:2d9bb35c481a8cd9c3df3bc657a8f44fdf8edf1a56177c188f8e5b97353a71e0
-size 959
+{
+  "name" : "bcss",
+  "root_page_url": "https://forum.bcss.org.uk/",
+  "general_threads_page_url" : "https://forum.bcss.org.uk/viewforum.php?f=1",
+  "general_thread_url" : "https://forum.bcss.org.uk/viewtopic.php",
+  "general_profile_url" : "https://forum.bcss.org.uk/memberlist.php",
+  "thread_name_regex" : {"name" : "h2", "class_" : "topic-title"},
+  "block_regex" : {"name" :  "div" , "class_" :  ["post has-profile bg1","post has-profile bg2"]},
+  "comment_regex" : {"name" : "div", "class_" :  "content"},
+  "profile_regex" : {"name" : "dl", "class_" :  "postprofile"},
+  "profile_name_regex" : {"name" : "a", "class_":  ["username","username-coloured"]},
+  "profile_link_regex" : {"name" : "a", "class_":  ["username","username-coloured"]},
+  "date_regex" : {"name" :  "p", "class_" :  "author"},
+  "attributes_regex": {"username": {"name" :  "h2", "class_": "forum-title"}, "user_stats" : {"name" :  "dl", "class_" : "details" } }
+}
+
