@@ -65,65 +65,64 @@ def create_custom_site(config):
     name = config["name"]
 
     #path = '..' + os.sep + 'crawler' + os.sep + 'web_director' + os.sep + 'parser' + os.sep + 'custom_webpages'
+    
+    files = os.listdir(WEBPAGE_PATH)
+    file = [file for file in files if file.split(".")[0] == name][0]
+    with open(WEBPAGE_PATH + os.sep + file) as json_file:
+        data = json.load(json_file)
+        if config["type"] == "forum":
+            webpage = CustomWebpage(data["name"])
+            webpage.root_page_url = data["root_page_url"]
+            webpage.general_profile_url = data["general_profile_url"]
+            webpage.general_start_page_url = data["general_threads_page_url"]
+            webpage.general_thread_url = data["general_thread_url"]
+            webpage._thread_name_regex = data["thread_name_regex"]
+            webpage._block_regex = data["block_regex"]
+            webpage._comment_regex = data["comment_regex"]
+            webpage._profile_regex = data["profile_regex"]
+            webpage._profile_name_regex = data["profile_name_regex"]
+            webpage._profile_link_regex = data["profile_link_regex"]
+            webpage._date_regex = data["date_regex"]
+            webpage._attributes_regex = data["attributes_regex"]
+            if "timeout_hours" in config :
+                timeout = config["timeout_hours"]
 
-    for file in os.listdir(WEBPAGE_PATH):
-        with open(WEBPAGE_PATH + os.sep + file) as json_file:
-            data = json.load(json_file)
-            if data["name"] not in name:
-                continue
-            if config["type"] == "forum":
-                webpage = CustomWebpage(data["name"])
-                webpage.root_page_url = data["root_page_url"]
-                webpage.general_profile_url = data["general_profile_url"]
-                webpage.general_start_page_url = data["general_threads_page_url"]
-                webpage.general_thread_url = data["general_thread_url"]
-                webpage._thread_name_regex = data["thread_name_regex"]
-                webpage._block_regex = data["block_regex"]
-                webpage._comment_regex = data["comment_regex"]
-                webpage._profile_regex = data["profile_regex"]
-                webpage._profile_name_regex = data["profile_name_regex"]
-                webpage._profile_link_regex = data["profile_link_regex"]
-                webpage._date_regex = data["date_regex"]
-                webpage._attributes_regex = data["attributes_regex"]
-                if "timeout_hours" in config :
-                    timeout = config["timeout_hours"]
-
-                    if timeout == -1:
-                        webpage.timeout_hours = None
-                    else:
-                        webpage.timeout_hours = timeout
-                else :
+                if timeout == -1:
                     webpage.timeout_hours = None
-                return webpage
-            if config["type"] == "marketplace":
-                webpage = CustomMarketPlace(data["name"])
-                webpage.root_page_url = data["root_page_url"]
-                webpage.general_start_page_url = data["general_items_url"]
-                webpage.general_item_url = data["general_item_url"]
-                webpage._sale_item_name_regex = data["sale_item_name_regex"]
-                webpage._sale_item_description_regex = data["sale_item_description_regex"]
-                webpage._seller_name_regex = data["seller_name_regex"]
-                webpage._seller_description_regex = data["seller_description_regex"]
-                webpage._seller_url_regex = data["seller_url_regex"]
-                webpage._date_regex = data["date_regex"]
-                webpage._price_regex = data["price_regex"]
-                webpage._review_block_regex = data["review_block_regex"]
-                webpage._review_username_regex = data["review_username_regex"]
-                webpage._review_date_regex = data["review_date_regex"]
-                webpage._review_title_regex = data["review_title_regex"]
-                webpage._review_description_regex = data["review_description_regex"]
-                webpage._review_link_regex = data["review_link_regex"]
-                webpage._attributes_regex = data["attributes_regex"]
-                if "timeout_hours" in config :
-                    timeout = config["timeout_hours"]
+                else:
+                    webpage.timeout_hours = timeout
+            else :
+                webpage.timeout_hours = None
+            return webpage
+        if config["type"] == "marketplace":
+            webpage = CustomMarketPlace(data["name"])
+            webpage.root_page_url = data["root_page_url"]
+            webpage.general_start_page_url = data["general_items_url"]
+            webpage.general_item_url = data["general_item_url"]
+            webpage._sale_item_name_regex = data["sale_item_name_regex"]
+            webpage._sale_item_description_regex = data["sale_item_description_regex"]
+            webpage._seller_name_regex = data["seller_name_regex"]
+            webpage._seller_description_regex = data["seller_description_regex"]
+            webpage._seller_url_regex = data["seller_url_regex"]
+            webpage._date_regex = data["date_regex"]
+            webpage._price_regex = data["price_regex"]
+            webpage._review_block_regex = data["review_block_regex"]
+            webpage._review_username_regex = data["review_username_regex"]
+            webpage._review_date_regex = data["review_date_regex"]
+            webpage._review_title_regex = data["review_title_regex"]
+            webpage._review_description_regex = data["review_description_regex"]
+            webpage._review_link_regex = data["review_link_regex"]
+            webpage._attributes_regex = data["attributes_regex"]
+            if "timeout_hours" in config :
+                timeout = config["timeout_hours"]
 
-                    if timeout == -1:
-                        webpage.timeout_hours = None
-                    else:
-                        webpage.timeout_hours = timeout
-                else :
+                if timeout == -1:
                     webpage.timeout_hours = None
-                return webpage
+                else:
+                    webpage.timeout_hours = timeout
+            else :
+                webpage.timeout_hours = None
+            return webpage
 
     raise Exception("Cannot find custom site")
 
