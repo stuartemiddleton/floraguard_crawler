@@ -444,6 +444,7 @@ class WebpageHandler:
             if not (self.ignore_reviews):
                 csv_export["review"] = []
                 csv_export["review title"] = []
+                csv_export["review_urls"] = []
 
         ######### CUSTOM NERS ##########
         path = self.lexicon_config_location
@@ -506,7 +507,7 @@ class WebpageHandler:
                                 all_review_titles.extend(review["thread"])
                                 all_review_urls.extend((review["url"]))
 
-                            csv_export["thread_url"].append(all_review_urls)
+                            csv_export["review_urls"].append(all_review_urls)
                             csv_export["review"].append(all_review_comments)
                             csv_export["review title"].append(all_review_titles)
 
