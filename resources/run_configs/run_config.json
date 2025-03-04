@@ -1,7 +1,9 @@
 {
-  "name": "books",
+  "name": "ebay3",
   "type" : "marketplace",
   "depth": "100",
+  "concurrent_requests": 8,
+  "concurrent_requests_per_domain": 4,
   "comment_model": "keyword",
   "thread_model": "all",
   "filter_comments" : true,
@@ -10,9 +12,8 @@
   "anonymous" : false,
   "use_comment_file" : true,
   "comment_keyword_names" : [
-    "books.txt"
+    "conophytum.txt"
   ],
   "thread_keyword": {},
-  "timeout_hours": -1
+  "timeout_hours": 0.1
 }
-

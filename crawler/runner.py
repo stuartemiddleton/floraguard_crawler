@@ -17,7 +17,11 @@ from web_director.parser.custom_parser import create_custom_site, read_config, t
 def main():
     data = read_config()
     web = create_custom_site(data)
-    os.system("python -m scrapy crawl undercrawler -a url=" + web.get_general_start_page_url() + " -s DEPTH_LIMIT=" + str(data["depth"]) )
+    os.system(f"""python -m scrapy crawl undercrawler \
+              -a url=\"{web.get_general_start_page_url()}\" \
+                -s DEPTH_LIMIT={str(data["depth"])} \
+                    -s CONCURRENT_REQUESTS={data["concurrent_requests"]} \
+                        -s CONCURRENT_REQUESTS_PER_DOMAIN={data["concurrent_requests_per_domain"]}""")
 
 if __name__ == '__main__':
     main()

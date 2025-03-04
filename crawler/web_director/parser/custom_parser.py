@@ -186,34 +186,29 @@ def create_webpage_handler( timeout_hours = None ):
 
 
 def text_to_regex(dict):
-    regex = r"(?i)"
+    regex = r"(?i)\b("
+    
     for _, v in dict.items():
-        for i in range(0, len(v)):
-            if i == 0:
-                regex += r"(?=.*\b" + v[i]
-            regex += r"|.*\b" + v[i]
-        regex += r").*"
-    return str(regex.encode("utf-8"))
+        cleaned_v = [line.strip() for line in v if line]
+        v_line = "|".join(cleaned_v)
+        regex += v_line
+    
+    regex += r")\b"
+    regex = regex.encode("utf-8").decode()
+    return regex
 
 
 def read_txt(paths):
-    regex = r"(?i)"
+
+    regex = r"(?i)\b("
     for path in paths:
         with open(LEXICON_PATH + os.sep + path, encoding='utf-8') as f:
             lines = f.readlines()
-            if "excluded_terms" in path:
-                for i in range(0, len(lines)):
-                    if i == 0:
-                        regex += r"(?!^.*\b" + lines[i].strip() + r"\b"
-                    else:
-                        regex += r"|^.*\b" + lines[i].strip() + r"\b"
-                regex += r")"
-            else:
-                for i in range(0, len(lines)):
-                    if i == 0:
-                        regex += r"(?=^.*\b" + lines[i].strip() + r"\b"
-                    else:
-                        regex += r"|^.*\b" + lines[i].strip() + r"\b"
-                regex += r")"
-    regex += r".*"
-    return regex.encode("utf-8").decode()
+            lines = [line.strip() for line in lines if line]
+            joined_lines = "|".join(lines)
+            regex += joined_lines
+    
+    regex += r")\b"
+    regex = regex.encode("utf-8").decode()
+
+    return regex
