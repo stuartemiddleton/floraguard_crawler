@@ -2,11 +2,11 @@
 
 The FloraGuard crawler is designed to crawl online discussion forums and marketplaces connected to the illegal wildlife trade (IWT). It is build on top of the DARPA MEMEX undercrawler software (https://github.com/TeamHG-Memex/undercrawler) and includes configuration to define relevance patterns to help focus posts crawled.
 
-This work was funded by the ESRC FloraGuard project (ES/R003254/1) and DEFRA Illegal Wildlife Trade Challenge Fund project (https://iwt.challengefund.org.uk/project/XXIWT114/). This is a mixed IPR repository with software created by University of Southampton (individually from FloraGuard project), and jointly created by University of Southampton and Royal Botanic Gardens, Kew (Illegal Wildlife Trade Challenge Fund project). The software copyright headers contain more details.
+This work was funded by the ESRC 'FloraGuard' project (ES/R003254/1), Darwin Initiative funded Uncovering the Illegal Trade in South African Succulents project and DEFRA Illegal Wildlife Trade Challenge Fund 'Harnessing Technology to End the Illegal Trade in Succulent Plants' project (https://iwt.challengefund.org.uk/project/XXIWT114/). This is a mixed IPR repository with software created by University of Southampton (individually from FloraGuard project), and jointly created by University of Southampton and Royal Botanic Gardens, Kew (Illegal Wildlife Trade Challenge Fund project). The software copyright headers contain more details.
 
-This software is released royalty-free under a 4-clause BSD open source license included in this repository.
+This software is released royalty-free under a creative commons attribution license (CC-BY) open source license included in this repository.
 
-Training material for legitimate IWT stakeholders and researchers can be obtained for free via a registration process setup by Royal Botanic Gardens, Kew (email TODO EMAIL FOR REGISTRATION).
+Software is provided as is with no expectation of support. However, you can contact repositary owners (University of Southampton and Royal Botanic Gardens, Kew) at the following email address: {sem03}@soton.ac.uk
 
 This work can be cited as:
 
@@ -15,6 +15,7 @@ Middleton, S.E. Lavorgna, L. Neumann, G. Whitehead, D. Information Extraction fr
 Whitehead, D. Cowell, C.R. Lavorgna, A. Middleton, S.E. Countering plant crime online: Cross-disciplinary collaboration in the FloraGuard study, Forensic Science International: Animals and Environments, Volume 1, Elsevier, 2021. https://doi.org/10.1016/j.fsiae.2021.100007
 
 Crawler has been tested on Win 10 and Ubuntu 20.04 LTS
+
 
 # Installation
 ## Step 1. Install the prerequisites *
@@ -90,20 +91,6 @@ sudo apt install dos2unix
 dos2unix environment.yml
 conda env create --name floraguard --file environment.yml
 conda activate floraguard
-
-
-# OLD
-sudo apt install python3.8-venv
-py -m venv ./env
-py -m pip install --upgrade pip
-py -m pip install wheel
-sudo apt-get install libfreetype-dev
-chmod +x ./env/bin/activate
-source ./env/bin/activate
-py -m pip install -r requirements.txt
-
-# use 'deactivate' to leave virtual environment
-
 
 ```
 
