@@ -1,3 +1,16 @@
+######################################################################
+#
+# (c) Copyright University of Southampton, 2022
+# # Copyright in this software belongs to University of Southampton,
+# Highfield, University Road, Southampton SO17 1BJ
+#
+# Created By : Sohaib Karous
+# Created Date : 2022/08/18
+# Project : FloraGuard
+#
+#######################################################################
+
+
 from base64 import b64decode
 import contextlib
 import hashlib

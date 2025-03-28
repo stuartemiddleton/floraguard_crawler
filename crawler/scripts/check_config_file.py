@@ -1,3 +1,15 @@
+######################################################################
+#
+# (c) Copyright University of Southampton, 2022
+# # Copyright in this software belongs to University of Southampton,
+# Highfield, University Road, Southampton SO17 1BJ
+#
+# Created By : Sohaib Karous
+# Created Date : 2022/08/18
+# Project : FloraGuard
+#
+#######################################################################
+
 """
     Script used to test whether the specified tags return correct values
     arg[1] = name of website

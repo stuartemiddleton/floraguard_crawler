@@ -6,7 +6,7 @@ This work was funded by the ESRC 'FloraGuard' project (ES/R003254/1), Darwin Ini
 
 This software is released royalty-free under a creative commons attribution license (CC-BY) open source license included in this repository.
 
-Software is provided as is with no expectation of support. However, you can contact repositary owners (University of Southampton and Royal Botanic Gardens, Kew) at the following email address: {sem03}@soton.ac.uk
+Software is provided as is with no expectation of support. However, you can contact repositary owners (University of Southampton and Royal Botanic Gardens, Kew) at the following email address: {fguard}@soton.ac.uk
 
 This work can be cited as:
 
