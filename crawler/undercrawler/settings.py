@@ -38,6 +38,34 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.httpcompression'
         '.HttpCompressionMiddleware': 810,
 }
+
+DOWNLOADER_MIDDLEWARES.update({
+    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+})
+
+DOWNLOADER_MIDDLEWARES.update({
+    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
+    'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
+})
+
+ROTATING_PROXY_LIST = [
+    '117.54.114.102:80',
+    '159.203.61.169:3128',
+    '141.95.238.126:8080',
+    '18.185.52.173:20202',
+    '52.201.245.219:20202',
+    '13.247.58.145:20201',
+    '54.84.68.213:20201',
+    '13.208.183.144:20201',
+    '56.155.29.90:20201',
+    '34.242.114.171:20201',
+    '54.180.234.231:20201',
+    '13.115.194.123:20202',
+]
+
+ROTATING_PROXY_PAGE_RETRY_TIMES = 5  # Number of retries for a failed proxy
+ROTATING_PROXY_BAN_POLICY = 'rotating_proxies.policy.BanDetectionPolicy'  # Default ban detection
+
 DUPEFILTER_CLASS = 'undercrawler.dupe_filter.DupeFilter'
 
 SPIDER_MIDDLEWARES = {
@@ -45,9 +73,9 @@ SPIDER_MIDDLEWARES = {
 }
 
 # use the same user agent as autologin by default
-USER_AGENT = ('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 '
-              '(KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 '
-              'Chrome/43.0.2357.130 Safari/537.36')
+# USER_AGENT = ('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 '
+#               '(KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 '
+#               'Chrome/43.0.2357.130 Safari/537.36')
 
 # enabled in CookiesMiddlewareIfNoSplash only when SPLASH_URL is set
 COOKIES_ENABLED = True
@@ -60,8 +88,8 @@ SPLASH_AUTOTHROTTLE_ENABLED = True
 AUTOTHROTTLE_MAX_DELAY = 5
 
 # HH scripts in Splash take a while to execute, so use higher values here
-CONCURRENT_REQUESTS = 32
-CONCURRENT_REQUESTS_PER_DOMAIN = 32
+CONCURRENT_REQUESTS = 8
+CONCURRENT_REQUESTS_PER_DOMAIN = 4
 
 DEPTH_PRIORITY = 1
 SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
@@ -69,6 +97,9 @@ SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
 SCHEDULER_DEBUG = True
 
 RETRY_ENABLED = True
+RETRY_TIMES = 5
+RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 408, 429, 403]
+
 
 TELNETCONSOLE_ENABLED = False
 

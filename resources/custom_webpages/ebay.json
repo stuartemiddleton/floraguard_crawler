@@ -1,16 +1,3 @@
-{
-  "name": "ebay",
-  "type": "marketplace",
-  "root_page_url" : "https://www.ebay.com/",
-  "general_items_url" : "https://www.ebay.com/sch/i.html?_nkw=conophytum",
-  "general_item_url" : "https://www.ebay.com/itm/",
-  "sale_item_name_regex" : {"name" :"h1", "class_" : "x-item-title__mainTitle"},
-  "seller_description_regex" : {"name": "iframe",  "id" :  "desc_ifr"},
-  "seller_block_regex" : {"name": "div",  "class_" :  "vim x-about-this-seller"},
-  "seller_name_regex" : {"name": "div",  "class_" :  "ux-seller-section__item--seller"},
-  "seller_url_regex" : {"name": "a", "data-testid" : "ux-action"},
-  "date_regex" : {},
-  "price_regex" : {"name" :  "span", "id" : ["prcIsum", "prcIsum_bidPrice"]},
-  "attributes_regex" : {}
-}
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:384e720ab09ea146216eb4545084919a991cfd0d3c3400537d92d58aa59a7754
+size 752

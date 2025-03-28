@@ -1,17 +1,3 @@
-{
-  "name": "ebay",
-  "type" : "marketplace",
-  "depth": "3",
-  "comment_model": "keyword",
-  "thread_model": "all",
-  "filter_comments" : true,
-  "comment_length" : 0,
-  "anonymous" : false,
-  "use_comment_file" : true,
-  "comment_keyword_names" : [
-    "plants.txt"
-  ],
-  "thread_keyword": {},
-  "timeout_hours": 0.5
-}
-
+version https://git-lfs.github.com/spec/v1
+oid sha256:80f5a93ebecd50a886e175a4a94a58e66049e50d158facb1299fb717a286da62
+size 340
