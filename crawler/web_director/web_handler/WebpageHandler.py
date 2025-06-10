@@ -57,6 +57,8 @@ class WebpageHandler:
         self.filter_comments = filter_comments
         self.ignore_reviews = ignore_reviews
         self.save_location = kargs["resource_location"]["save_file_location"]
+        if not os.path.isdir(self.save_location):
+            os.makedirs(self.save_location)
         self.webpage_config_location = kargs["resource_location"]["webpage_location"]
         self.lexicon_config_location = kargs["resource_location"]["lexicon_location"]
         self.save_file_name = kargs["save_file_name"] if kargs["save_file_name"] is not None else self.DEFAULT_SAVE_FILE
