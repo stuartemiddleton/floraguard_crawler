@@ -1,1 +1,8 @@
 env
+resources/run_configs/*
+!resources/run_configs/run_config.json
+resources/lexicon/*
+!resources/lexicon/unicorns.txt
+resources/exported_users/*
+resources/custom_webpages/*
+!resources/custom_webpages/mock_site.json
