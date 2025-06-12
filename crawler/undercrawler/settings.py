@@ -45,9 +45,15 @@ SPIDER_MIDDLEWARES = {
 }
 
 # use the same user agent as autologin by default
-USER_AGENT = ('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 '
-              '(KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 '
-              'Chrome/43.0.2357.130 Safari/537.36')
+USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_5) AppleWebKit/537.36"
+    " (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+)
+
+# Old user agents
+#('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 '
+#              '(KHTML, like Gecko) Ubuntu Chromium/43.0.2357.130 '
+#              'Chrome/43.0.2357.130 Safari/537.36')
 
 # enabled in CookiesMiddlewareIfNoSplash only when SPLASH_URL is set
 COOKIES_ENABLED = True
