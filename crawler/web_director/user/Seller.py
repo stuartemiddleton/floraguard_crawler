@@ -22,6 +22,8 @@ class SellerInfo:
         self.attributes = {}
 
     def add_item(self, url, desc, date, price, title, reviews, **kargs):
+
+        
         if url in self.comments:
             self.comments[url].append({
                 "description": desc,
@@ -30,7 +32,8 @@ class SellerInfo:
                 "url": url,
                 "comment": title,
                 "thread": title,
-                "reviews": reviews
+                "reviews": reviews,
+                **kargs
             })
         else:
             self.comments[url] = [{
@@ -40,7 +43,8 @@ class SellerInfo:
                 "url": url,
                 "comment": title,
                 "thread": title,
-                "reviews": reviews
+                "reviews": reviews,
+                **kargs
             }]
 
     def add_attribute(self, attribute_name, attribute):

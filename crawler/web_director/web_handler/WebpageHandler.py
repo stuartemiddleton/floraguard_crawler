@@ -328,19 +328,32 @@ class WebpageHandler:
                             review_user.add_comment(review_desc, review_title, url, review_date, note="New User")
                             review_users[username] = review_user
 
+            attributes = {}
+            for n, regex in self.webpage.attributes_regex().items():
+                for data in soup.find_all(**regex):
+                    #self.people[seller_name].add_attribute(n, data.get_text())
+                    if n in attributes:
+                        attributes[n] += [data.get_text()]
+                    else:
+                        attributes[n] = [data.get_text()]
+                    #attributes[n] = data.get_text()
+
             if seller_name in self.people:
-                self.people[seller_name].add_item(url, item_description, date, price, item_name, review_users,
-                                                  note="Existing Seller")
-                for n, regex in self.webpage.attributes_regex().items():
-                    for data in soup.find_all(**regex):
-                        self.people[seller_name].add_attribute(n, data.get_text())
+                self.people[seller_name].add_item(url, item_description, date, price, item_name, review_users, **attributes)
+                                                  #note="Existing Seller")
+                # for n, regex in self.webpage.attributes_regex().items():
+                #     for data in soup.find_all(**regex):
+                #         #self.people[seller_name].add_attribute(n, data.get_text())
+                #         attributes[n] = data.get_text()
+
             else:
                 seller = SellerInfo(seller_name, seller_url, seller_description)
-                seller.add_item(url, item_description, date, price, item_name, review_users, note="New Seller")
+                seller.add_item(url, item_description, date, price, item_name, review_users, **attributes)#note="New Seller")
                 self.people[seller_name] = seller
-                for n, regex in self.webpage.attributes_regex().items():
-                    for data in soup.find_all(**regex):
-                        self.people[seller_name].add_attribute(n, data.get_text())
+                # for n, regex in self.webpage.attributes_regex().items():
+                #     for data in soup.find_all(**regex):
+                #         #self.people[seller_name].add_attribute(n, data.get_text())
+                #         attributes[n] = data.get_text()
 
         self.direct_crawler()
 
@@ -518,6 +531,14 @@ class WebpageHandler:
                             addNERTags(comment["comment"], description=comment["description"])
                     else:
                         addNERTags(comment["comment"])
+
+                    if self.webpage.attributes_regex():
+                        for attribute in self.webpage.attributes_regex().keys():
+                            if attribute in comment:
+                                #logging.info("Adding attribute: " + attribute + " with value: " + str(exported_data[k][attribute]))
+                                csv_export[attribute].append(comment[attribute])
+                            else:
+                                csv_export[attribute].append(NOT_FOUND)
 
 
         if issubclass(self.webpage.__class__, MarketPlaceABC.MarketPlaceABC):
