@@ -56,7 +56,7 @@ _*Step by Step instructions_
 
 cd <base-dir>
 git clone https://github.com/stuartemiddleton/floraguard_crawler.git
-cd focussed_crawler
+cd floraguard_crawler
 ```
 
 ## Step 3. Set up the environment & activate it
