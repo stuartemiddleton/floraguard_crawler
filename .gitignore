@@ -6,4 +6,4 @@ resources/lexicon/*
 resources/exported_users/*
 resources/custom_webpages/*
 !resources/custom_webpages/mock_site.json
-!resources/base_marketplace.txt
+!resources/base_marketplace.json
